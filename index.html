@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..900;1,9..40,400..700&family=Besley:wght@600..900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=2026-10-27d">
+  <link rel="stylesheet" href="css/style.css?v=2026-10-27e">
   <!-- Mark JavaScript as available before first paint, so scroll reveals start hidden instead of flashing -->
   <script>
     document.documentElement.classList.add("js");
@@ -40,42 +40,49 @@
 
   <!-- HERO -->
   <section class="hero" aria-label="Introduction">
-    <svg class="scene" viewBox="0 0 1600 760" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+    <!-- The scene is split into layers so the browser can move each one on the GPU (sky fade, sunrise,
+         cloud drift, hill sway) without repainting the whole picture every frame. Every layer shares the
+         same viewBox and crop, so they line up exactly. The sky itself is a CSS gradient on .hero. -->
+    <svg class="scene layer-glow" viewBox="0 0 1600 760" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
       <defs>
-        <linearGradient id="sky-dawn" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#F7C9A6"/><stop offset="0.55" stop-color="#FBE3C6"/><stop offset="1" stop-color="#F5EDE0"/>
-        </linearGradient>
-        <linearGradient id="sky-day" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#A9D6E8"/><stop offset="0.6" stop-color="#DDEFE9"/><stop offset="1" stop-color="#F5EDE0"/>
-        </linearGradient>
+        <radialGradient id="horizon-glow">
+          <stop offset="0" stop-color="#FFF8E4" stop-opacity="1"/>
+          <stop offset="0.5" stop-color="#FFE6B8" stop-opacity="0.65"/>
+          <stop offset="1" stop-color="#FFE3B3" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <ellipse cx="1140" cy="455" rx="1100" ry="230" fill="url(#horizon-glow)"/>
+    </svg>
+    <svg class="scene layer-sun" viewBox="0 0 1600 760" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+      <defs>
         <radialGradient id="sun-glow">
           <stop offset="0" stop-color="#FFF6DA" stop-opacity="1"/>
           <stop offset="0.25" stop-color="#FFE09A" stop-opacity="0.8"/>
           <stop offset="0.6" stop-color="#FFCB7D" stop-opacity="0.32"/>
           <stop offset="1" stop-color="#FFC877" stop-opacity="0"/>
         </radialGradient>
-        <radialGradient id="horizon-glow">
-          <stop offset="0" stop-color="#FFF8E4" stop-opacity="1"/>
-          <stop offset="0.5" stop-color="#FFE6B8" stop-opacity="0.65"/>
-          <stop offset="1" stop-color="#FFE3B3" stop-opacity="0"/>
-        </radialGradient>
-        <path id="track" pathLength="1" d="M-80,592 C240,556 420,622 760,590 S1300,556 1700,600"/>
       </defs>
-      <rect width="1600" height="760" fill="url(#sky-dawn)"/>
-      <rect class="sky-day" width="1600" height="760" fill="url(#sky-day)"/>
-      <ellipse class="horizon-glow" cx="1140" cy="455" rx="1100" ry="230" fill="url(#horizon-glow)"/>
-      <g class="sunwrap">
-        <circle class="sun-glow" cx="1230" cy="250" r="320" fill="url(#sun-glow)"/>
-        <g class="sun-rays" stroke="#FFE7AE" stroke-width="7" stroke-linecap="round"><line x1="1334" y1="278" x2="1358" y2="284"/><line x1="1306" y1="326" x2="1336" y2="356"/><line x1="1258" y1="354" x2="1264" y2="378"/><line x1="1202" y1="354" x2="1191" y2="395"/><line x1="1154" y1="326" x2="1137" y2="343"/><line x1="1126" y1="278" x2="1085" y2="289"/><line x1="1126" y1="222" x2="1102" y2="216"/><line x1="1154" y1="174" x2="1124" y2="144"/><line x1="1202" y1="146" x2="1196" y2="122"/><line x1="1258" y1="146" x2="1269" y2="105"/><line x1="1306" y1="174" x2="1323" y2="157"/><line x1="1334" y1="222" x2="1375" y2="211"/></g>
-        <circle class="sun" cx="1230" cy="250" r="78" fill="#F2B33D"/>
-        <circle cx="1230" cy="250" r="78" fill="none" stroke="#FFD27A" stroke-width="6" opacity="0.8"/>
-      </g>
-      <g class="clouds" fill="#FFFDF8" opacity="0.75">
+      <circle cx="1230" cy="250" r="320" fill="url(#sun-glow)"/>
+      <g stroke="#FFE7AE" stroke-width="7" stroke-linecap="round" opacity="0.6"><line x1="1334" y1="278" x2="1358" y2="284"/><line x1="1306" y1="326" x2="1336" y2="356"/><line x1="1258" y1="354" x2="1264" y2="378"/><line x1="1202" y1="354" x2="1191" y2="395"/><line x1="1154" y1="326" x2="1137" y2="343"/><line x1="1126" y1="278" x2="1085" y2="289"/><line x1="1126" y1="222" x2="1102" y2="216"/><line x1="1154" y1="174" x2="1124" y2="144"/><line x1="1202" y1="146" x2="1196" y2="122"/><line x1="1258" y1="146" x2="1269" y2="105"/><line x1="1306" y1="174" x2="1323" y2="157"/><line x1="1334" y1="222" x2="1375" y2="211"/></g>
+      <circle cx="1230" cy="250" r="78" fill="#F2B33D"/>
+      <circle cx="1230" cy="250" r="78" fill="none" stroke="#FFD27A" stroke-width="6" opacity="0.8"/>
+    </svg>
+    <svg class="scene layer-clouds" viewBox="0 0 1600 760" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+      <g fill="#FFFDF8" opacity="0.75">
         <ellipse cx="300" cy="150" rx="120" ry="22"/><ellipse cx="380" cy="132" rx="70" ry="20"/>
         <ellipse cx="980" cy="110" rx="140" ry="20"/><ellipse cx="1060" cy="96" rx="60" ry="16"/>
       </g>
-      <g class="hills far"><path d="M0,520 C200,440 380,470 560,430 S900,400 1100,450 S1450,420 1600,440 L1600,760 L0,760Z" fill="#9CC5A5"/></g>
-      <g class="hills mid"><path d="M0,580 C220,520 420,560 640,520 S1000,500 1240,540 S1500,520 1600,530 L1600,760 L0,760Z" fill="#5E9E78"/></g>
+    </svg>
+    <svg class="scene layer-hill-far" viewBox="0 0 1600 760" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+      <path d="M-40,526 L0,520 C200,440 380,470 560,430 S900,400 1100,450 S1450,420 1600,440 L1640,446 L1640,760 L-40,760Z" fill="#9CC5A5"/>
+    </svg>
+    <svg class="scene layer-hill-mid" viewBox="0 0 1600 760" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+      <path d="M-40,588 L0,580 C220,520 420,560 640,520 S1000,500 1240,540 S1500,520 1600,530 L1640,534 L1640,760 L-40,760Z" fill="#5E9E78"/>
+    </svg>
+    <svg class="scene layer-front" viewBox="0 0 1600 760" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+      <defs>
+        <path id="track" pathLength="1" d="M-80,592 C240,556 420,622 760,590 S1300,556 1700,600"/>
+      </defs>
       <g class="trees">
         <g transform="translate(1040,470)"><rect x="-4" y="0" width="8" height="70" fill="#3B2F2A"/><ellipse cx="0" cy="-8" rx="46" ry="30" fill="#2F6E50"/><ellipse cx="-30" cy="10" rx="30" ry="20" fill="#2F6E50"/><ellipse cx="32" cy="6" rx="28" ry="18" fill="#2F6E50"/></g>
         <g transform="translate(1390,480) scale(0.8)"><rect x="-4" y="0" width="8" height="70" fill="#3B2F2A"/><ellipse cx="0" cy="-8" rx="46" ry="30" fill="#2F6E50"/><ellipse cx="-30" cy="10" rx="30" ry="20" fill="#2F6E50"/></g>
@@ -407,6 +414,6 @@
     </div>
   </main>
 
-  <script defer src="js/main.js?v=2026-10-27"></script>
+  <script defer src="js/main.js?v=2026-10-27e"></script>
 </body>
 </html>

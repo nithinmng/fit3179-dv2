@@ -68,8 +68,7 @@ p, li, .kpi-label { text-wrap: pretty; }
   position: sticky; top: 0; z-index: 20;
   display: flex; align-items: center; justify-content: space-between; gap: 24px;
   padding: 12px 28px;
-  background: rgba(245, 237, 224, 0.88);
-  backdrop-filter: blur(10px);
+  background: rgba(245, 237, 224, 0.97);
   border-bottom: 1px solid rgba(227, 213, 190, 0.7);
   font-family: var(--font-ui);
 }
@@ -92,7 +91,7 @@ p, li, .kpi-label { text-wrap: pretty; }
 .kicker { font-family: var(--font-ui); text-transform: uppercase; letter-spacing: 0.14em; font-size: var(--fs-eyebrow); font-weight: 700; color: var(--coral-deep); margin: 0 0 14px; }
 h1 { font-family: var(--font-head); font-weight: 800; font-size: var(--fs-hero); line-height: 1; letter-spacing: -0.02em; margin: 0 0 34px; color: var(--ink); }
 h1 em { font-style: normal; color: var(--euc); background: linear-gradient(transparent 68%, rgba(242, 179, 61, 0.55) 68%) no-repeat 0 0 / 100% 100%; }
-.dek { font-size: var(--fs-lede); line-height: 1.55; max-width: 640px; margin: 0 0 16px; color: var(--ink); background: rgba(255, 253, 248, 0.78); backdrop-filter: blur(6px); padding: 14px 18px; border-radius: 14px; box-shadow: 0 6px 24px rgba(27, 42, 65, 0.08); }
+.dek { font-size: var(--fs-lede); line-height: 1.55; max-width: 640px; margin: 0 0 16px; color: var(--ink); background: rgba(255, 253, 248, 0.9); padding: 14px 18px; border-radius: 14px; box-shadow: 0 6px 24px rgba(27, 42, 65, 0.08); }
 .byline { display: inline-block; font-family: var(--font-ui); font-size: 14px; color: var(--ink); margin: 0; background: rgba(255, 253, 248, 0.78); padding: 6px 12px; border-radius: 999px; }
 .scroll-cue {
   position: absolute; z-index: 2; left: 50%; bottom: 18px; translate: -50% 0;
@@ -120,40 +119,36 @@ h1 em { font-style: normal; color: var(--euc); background: linear-gradient(trans
 .kpi:nth-child(5) .kpi-num { color: var(--violet); }
 .kpi-label { display: block; font-family: var(--font-ui); font-size: var(--fs-label); font-weight: 500; color: var(--ink-soft); margin-top: 6px; line-height: 1.35; }
 
-/* Hero scene motion: slow, behind the copy, never over text */
-.sky-day { opacity: 0; animation: daybreak 22s var(--ease) 0.5s forwards; }
-.sunwrap { animation: sunrise 22s var(--ease) 0.5s forwards; }
-.sun-glow { transform-box: view-box; transform-origin: 1230px 250px; animation: glow 7s ease-in-out infinite alternate; }
-.sun-rays { transform-box: view-box; transform-origin: 1230px 250px; opacity: 0.6; animation: spin 120s linear infinite; }
-.horizon-glow { animation: horizon 14s ease-in-out infinite alternate; }
-@keyframes glow { from { opacity: 0.75; transform: scale(0.94); } to { opacity: 1; transform: scale(1.06); } }
-@keyframes spin { to { transform: rotate(360deg); } }
-@keyframes horizon { from { opacity: 0.75; } to { opacity: 1; } }
-.clouds { animation: drift 60s linear infinite alternate; }
-.hills.far { animation: sway 26s ease-in-out infinite alternate; }
-.hills.mid { animation: sway 34s ease-in-out infinite alternate-reverse; }
+/* Hero scene motion: slow, behind the copy, never over text.
+   Each moving part is its own layer and moves only with transform or opacity, so the browser
+   composites it on the GPU instead of repainting the whole scene every frame (smooth scrolling).
+   The sky is a CSS gradient; the day sky fades in over the dawn one. */
+.hero { background: linear-gradient(180deg, #F7C9A6 0%, #FBE3C6 55%, #F5EDE0 100%); }
+.hero::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, #A9D6E8 0%, #DDEFE9 60%, #F5EDE0 100%); opacity: 0; animation: daybreak 22s var(--ease) 0.5s forwards; will-change: opacity; }
+.layer-sun, .layer-clouds, .layer-hill-far, .layer-hill-mid { will-change: transform; }
+.layer-hill-far, .layer-hill-mid { overflow: visible; }
+.layer-sun { animation: sunrise 22s var(--ease) 0.5s both; }
 .runner { offset-path: path("M-80,592 C240,556 420,622 760,590 S1300,556 1700,600"); offset-rotate: 0deg; animation: run 26s linear infinite; }
 .runner.r2 { animation-duration: 31s; animation-delay: -9s; }
 .runner.r3 { animation-duration: 37s; animation-delay: -21s; }
 @keyframes daybreak { to { opacity: 1; } }
-@keyframes sunrise { from { transform: translateY(80px); } to { transform: translateY(-40px); } }
-@keyframes drift { from { transform: translateX(-40px); } to { transform: translateX(60px); } }
-@keyframes sway { from { transform: translateX(-12px); } to { transform: translateX(12px); } }
+@keyframes sunrise { from { translate: 0 10.5%; } to { translate: 0 -5.3%; } }
+@keyframes drift { from { transform: translateX(-2.5%); } to { transform: translateX(3.75%); } }
+@keyframes sway { from { transform: translateX(-0.75%); } to { transform: translateX(0.75%); } }
 @keyframes run { from { offset-distance: 0%; } to { offset-distance: 100%; } }
 
 /* ---------- Intro: the landscape builds, then the words arrive ----------
    Each element's resting style is its final state; `both` holds the first keyframe until its delay
    ends, so with motion reduced (animation: none) everything simply shows. Hills rise with the
    separate `translate` property, which leaves their sway (on `transform`) running. */
-.clouds { animation: drift 60s linear infinite alternate, cloud-in 2.2s ease-out 0.2s both; }
-.hills.far { animation: sway 26s ease-in-out infinite alternate, hill-in 1.5s var(--ease) 0s both; --rise: 70px; }
-.hills.mid { animation: sway 34s ease-in-out infinite alternate-reverse, hill-in 1.5s var(--ease) 0.15s both; --rise: 110px; }
+.layer-clouds { animation: drift 60s linear infinite alternate, fade-in 2.2s ease-out 0.2s both; }
+.layer-hill-far { animation: sway 26s ease-in-out infinite alternate, hill-in 1.5s var(--ease) 0s both; --rise: 9%; }
+.layer-hill-mid { animation: sway 34s ease-in-out infinite alternate-reverse, hill-in 1.5s var(--ease) 0.15s both; --rise: 14%; }
 .hills.near { animation: hill-in 1.5s var(--ease) 0.3s both; --rise: 150px; }
 .trees { animation: hill-in 1.4s var(--ease) 0.45s both, fade-in 1s ease-out 0.45s both; --rise: 60px; }
 .track-line { stroke-dasharray: 1 1; animation: track-draw 1.6s var(--ease) 0.9s both; }
 .on-track { animation: fade-in 0.8s ease-out 2s both; }
 @keyframes hill-in { from { translate: 0 var(--rise); } to { translate: 0 0; } }
-@keyframes cloud-in { from { opacity: 0; } to { opacity: 0.75; } }
 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes track-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
 
@@ -232,8 +227,6 @@ h2 { font-family: var(--font-head); font-weight: 700; font-size: var(--fs-h2); l
 /* Hill edges between bands: the next band rises over a two-layer hill line, the back layer drifts */
 .hill-edge { height: 110px; overflow: hidden; margin-bottom: -1px; }
 .hill-edge svg { display: block; width: 120%; height: 110px; margin-left: -10%; }
-.hill-edge .back { animation: sway 24s ease-in-out infinite alternate; }
-.hill-edge .front { animation: sway 32s ease-in-out infinite alternate-reverse; }
 .to-2 { background: var(--band-1); } .to-2 .back { fill: var(--band-2-deep); } .to-2 .front { fill: var(--band-2); }
 .to-3 { background: var(--band-2); } .to-3 .back { fill: var(--band-3-deep); } .to-3 .front { fill: var(--band-3); }
 .to-4 { background: var(--band-3); } .to-4 .back { fill: var(--band-4-deep); } .to-4 .front { fill: var(--band-4); }
@@ -351,7 +344,7 @@ code { font-size: 0.9em; background: #EFE5D3; padding: 1px 5px; border-radius: 5
 /* ---------- Reduced motion: everything still, nothing hidden ---------- */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
-  .sky-day { opacity: 1; }
+  .hero::before { opacity: 1; }
   .js .reveal { opacity: 1; transform: none; }
   .js .kpi { opacity: 1; translate: none; }
   .anim-wait .vis svg .role-mark > path, .anim-wait .vis svg .role-mark > line, .anim-wait .vis svg .role-mark > g > path { opacity: 1; }

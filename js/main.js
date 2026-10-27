@@ -252,6 +252,7 @@ const bar = document.getElementById("progress");
 const links = [...document.querySelectorAll(".topbar nav a")];
 const sections = links.map((a) => document.querySelector(a.getAttribute("href")));
 let ticking = false;
+let lastCurrent = null;
 function onScroll() {
   ticking = false;
   const h = document.documentElement;
@@ -259,6 +260,9 @@ function onScroll() {
   bar.style.transform = `scaleX(${p.toFixed(4)})`;
   let current = -1;
   sections.forEach((s, i) => { if (s && s.getBoundingClientRect().top < 140) current = i; });
+  // Only touch the nav when the active section changes, so scrolling causes no style work
+  if (current === lastCurrent) return;
+  lastCurrent = current;
   links.forEach((a, i) => {
     a.classList.toggle("active", i === current);
     if (i === current) a.setAttribute("aria-current", "true"); else a.removeAttribute("aria-current");
