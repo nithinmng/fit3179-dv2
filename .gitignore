@@ -1,0 +1,7 @@
+# Large raw inputs: re-download them (see README) and run scripts/build_data.py
+data/raw/ausplay/
+data/raw/abs_mb/
+data/raw/abs_lga/
+# Old state outlines with no stated licence; the page uses ABS 2021 boundaries instead
+data/raw/states/states.geojson
+__pycache__/

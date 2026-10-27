@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Outside is Australia's biggest gym</title>
+  <meta name="description" content="A data story about how Australian adults exercise in public space, who heads outdoors, and how much room there is to move. FIT3179 Data Visualisation 2.">
+  <meta name="author" content="Nithin Mangalath">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..900;1,9..40,400..700&family=Besley:wght@600..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=2026-10-27d">
+  <!-- Mark JavaScript as available before first paint, so scroll reveals start hidden instead of flashing -->
+  <script>
+    document.documentElement.classList.add("js");
+    // Always open at the top, where the intro plays: no jumping back to the last position or to a #section
+    if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+    window.openedWithHash = Boolean(location.hash);
+    if (location.hash) history.replaceState(null, "", location.pathname + location.search);
+  </script>
+  <!-- Deferred scripts run in this order after the page is parsed, before js/main.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/vega@5.30.0"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/vega-lite@5.21.0"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/vega-embed@6.26.0"></script>
+</head>
+<body>
+  <a class="skip" href="#s1">Skip to the story</a>
+
+  <header class="topbar" id="top">
+    <a class="brand" href="#top"><span class="brand-dot"></span>Open-air gym</a>
+    <nav aria-label="Sections">
+      <a href="#s1"><span>01</span> The open-air gym</a>
+      <a href="#s2"><span>02</span> Who's out there</a>
+      <a href="#s3"><span>03</span> Why, when, how</a>
+      <a href="#s4"><span>04</span> Room to move</a>
+      <a href="#about"><span>05</span> Data &amp; method</a>
+    </nav>
+    <div class="progress" aria-hidden="true"><div class="progress-bar" id="progress"></div></div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero" aria-label="Introduction">
+    <svg class="scene" viewBox="0 0 1600 760" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+      <defs>
+        <linearGradient id="sky-dawn" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#F7C9A6"/><stop offset="0.55" stop-color="#FBE3C6"/><stop offset="1" stop-color="#F5EDE0"/>
+        </linearGradient>
+        <linearGradient id="sky-day" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#A9D6E8"/><stop offset="0.6" stop-color="#DDEFE9"/><stop offset="1" stop-color="#F5EDE0"/>
+        </linearGradient>
+        <radialGradient id="sun-glow">
+          <stop offset="0" stop-color="#FFF6DA" stop-opacity="1"/>
+          <stop offset="0.25" stop-color="#FFE09A" stop-opacity="0.8"/>
+          <stop offset="0.6" stop-color="#FFCB7D" stop-opacity="0.32"/>
+          <stop offset="1" stop-color="#FFC877" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="horizon-glow">
+          <stop offset="0" stop-color="#FFF8E4" stop-opacity="1"/>
+          <stop offset="0.5" stop-color="#FFE6B8" stop-opacity="0.65"/>
+          <stop offset="1" stop-color="#FFE3B3" stop-opacity="0"/>
+        </radialGradient>
+        <path id="track" pathLength="1" d="M-80,592 C240,556 420,622 760,590 S1300,556 1700,600"/>
+      </defs>
+      <rect width="1600" height="760" fill="url(#sky-dawn)"/>
+      <rect class="sky-day" width="1600" height="760" fill="url(#sky-day)"/>
+      <ellipse class="horizon-glow" cx="1140" cy="455" rx="1100" ry="230" fill="url(#horizon-glow)"/>
+      <g class="sunwrap">
+        <circle class="sun-glow" cx="1230" cy="250" r="320" fill="url(#sun-glow)"/>
+        <g class="sun-rays" stroke="#FFE7AE" stroke-width="7" stroke-linecap="round"><line x1="1334" y1="278" x2="1358" y2="284"/><line x1="1306" y1="326" x2="1336" y2="356"/><line x1="1258" y1="354" x2="1264" y2="378"/><line x1="1202" y1="354" x2="1191" y2="395"/><line x1="1154" y1="326" x2="1137" y2="343"/><line x1="1126" y1="278" x2="1085" y2="289"/><line x1="1126" y1="222" x2="1102" y2="216"/><line x1="1154" y1="174" x2="1124" y2="144"/><line x1="1202" y1="146" x2="1196" y2="122"/><line x1="1258" y1="146" x2="1269" y2="105"/><line x1="1306" y1="174" x2="1323" y2="157"/><line x1="1334" y1="222" x2="1375" y2="211"/></g>
+        <circle class="sun" cx="1230" cy="250" r="78" fill="#F2B33D"/>
+        <circle cx="1230" cy="250" r="78" fill="none" stroke="#FFD27A" stroke-width="6" opacity="0.8"/>
+      </g>
+      <g class="clouds" fill="#FFFDF8" opacity="0.75">
+        <ellipse cx="300" cy="150" rx="120" ry="22"/><ellipse cx="380" cy="132" rx="70" ry="20"/>
+        <ellipse cx="980" cy="110" rx="140" ry="20"/><ellipse cx="1060" cy="96" rx="60" ry="16"/>
+      </g>
+      <g class="hills far"><path d="M0,520 C200,440 380,470 560,430 S900,400 1100,450 S1450,420 1600,440 L1600,760 L0,760Z" fill="#9CC5A5"/></g>
+      <g class="hills mid"><path d="M0,580 C220,520 420,560 640,520 S1000,500 1240,540 S1500,520 1600,530 L1600,760 L0,760Z" fill="#5E9E78"/></g>
+      <g class="trees">
+        <g transform="translate(1040,470)"><rect x="-4" y="0" width="8" height="70" fill="#3B2F2A"/><ellipse cx="0" cy="-8" rx="46" ry="30" fill="#2F6E50"/><ellipse cx="-30" cy="10" rx="30" ry="20" fill="#2F6E50"/><ellipse cx="32" cy="6" rx="28" ry="18" fill="#2F6E50"/></g>
+        <g transform="translate(1390,480) scale(0.8)"><rect x="-4" y="0" width="8" height="70" fill="#3B2F2A"/><ellipse cx="0" cy="-8" rx="46" ry="30" fill="#2F6E50"/><ellipse cx="-30" cy="10" rx="30" ry="20" fill="#2F6E50"/></g>
+        <g transform="translate(180,500) scale(0.9)"><rect x="-4" y="0" width="8" height="70" fill="#3B2F2A"/><ellipse cx="0" cy="-8" rx="46" ry="30" fill="#2F6E50"/><ellipse cx="30" cy="8" rx="30" ry="20" fill="#2F6E50"/></g>
+      </g>
+      <g class="hills near"><path d="M0,640 C260,600 520,650 800,620 S1300,590 1600,630 L1600,760 L0,760Z" fill="#1F5C45"/></g>
+      <use class="track-line" href="#track" fill="none" stroke="#F5EDE0" stroke-width="7" stroke-linecap="round" opacity="0.85"/>
+      <g class="on-track">
+        <g class="runner r1"><circle r="7" cy="-26" fill="#F0644A"/><rect x="-5" y="-19" width="10" height="20" rx="4" fill="#F0644A"/></g>
+        <g class="runner r2"><circle r="6" cy="-23" fill="#F2B33D"/><rect x="-4.5" y="-17" width="9" height="18" rx="4" fill="#F2B33D"/></g>
+        <g class="runner r3"><circle r="6.5" cy="-24" fill="#FFFDF8"/><rect x="-4.5" y="-18" width="9" height="19" rx="4" fill="#FFFDF8"/></g>
+        <g class="gym" transform="translate(1180,560)" stroke="#F5EDE0" stroke-width="5" stroke-linecap="round" fill="none">
+          <path d="M0,0 V-60 M60,0 V-60 M-6,-60 H66"/><path d="M14,-60 V-30 M46,-60 V-26"/>
+        </g>
+      </g>
+    </svg>
+
+    <div class="hero-copy">
+      <p class="kicker">Outdoor fitness in Australia · 2025 data</p>
+      <h1><span class="w" style="--i: 0">Outside</span> <span class="w" style="--i: 1">is</span> <span class="w" style="--i: 2">Australia's</span> <em><span class="w" style="--i: 3">biggest</span> <span class="w" style="--i: 4">gym</span></em></h1>
+      <p class="dek">In 2025, six in ten Australian adults exercised in a park, street, beach or other public space. That is twice as many as used a gym or leisure centre. Who heads outdoors, what keeps people inside, and how much room is there to move?</p>
+      <p class="byline">By <strong>Nithin Mangalath</strong> · 25 October 2026</p>
+    </div>
+
+    <a class="scroll-cue" href="#kpis"><span>Scroll</span><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M5 9l7 7 7-7" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+  </section>
+
+  <!-- The headline numbers sit on the hero's dark-green ground, then a hill edge drops into section 1 -->
+  <div class="kpi-band" id="kpis">
+    <div class="kpis" role="list" aria-label="Headline numbers">
+      <div class="kpi" role="listitem" style="--i: 0"><span class="kpi-num" data-count="62" data-suffix="%">62%</span><span class="kpi-label">of adults exercised in public space</span></div>
+      <div class="kpi" role="listitem" style="--i: 1"><span class="kpi-num" data-count="31" data-suffix="%">31%</span><span class="kpi-label">used a gym, fitness or leisure centre</span></div>
+      <div class="kpi" role="listitem" style="--i: 2"><span class="kpi-num" data-count="51" data-suffix="%">51%</span><span class="kpi-label">of active adults exercise partly <span class="nowrap">to be outdoors</span></span></div>
+      <div class="kpi" role="listitem" style="--i: 3"><span class="kpi-num" data-count="1745" data-format="comma">1,745</span><span class="kpi-label">outdoor gyms mapped <span class="nowrap">on OpenStreetMap</span></span></div>
+      <div class="kpi" role="listitem" style="--i: 4"><span class="kpi-num" data-count="32" data-suffix=" m²">32 m²</span><span class="kpi-label">median local park per resident in the densest third of <span class="nowrap">capital-city</span> councils</span></div>
+    </div>
+  </div>
+  <div class="hill-edge to-1" aria-hidden="true">
+    <svg viewBox="0 0 1600 110" preserveAspectRatio="none"><path class="back" d="M0,60 C230,32 450,78 700,50 S1120,24 1360,56 S1540,62 1600,44 L1600,110 L0,110Z"/><path class="front" d="M0,86 C280,58 520,100 830,78 S1310,56 1600,84 L1600,110 L0,110Z"/></svg>
+  </div>
+
+  <main>
+    <noscript><p class="noscript">The charts on this page are drawn with JavaScript (Vega-Lite). Turn JavaScript on to see them; the text and sources below still make sense on their own.</p></noscript>
+
+    <!-- SECTION 1 -->
+    <section class="chapter" id="s1">
+      <div class="chapter-head reveal">
+        <p class="chapter-num">01</p>
+        <h2>The open-air gym</h2>
+        <p class="lede">Ask Australians where they exercised last year and one answer dominates. Parks, footpaths, beaches and trails beat any single gym, pool or club category.</p>
+      </div>
+
+      <figure class="card wide reveal" id="fig-01">
+        <figcaption>
+          <p class="fig-num">Chart 1</p>
+          <h3>Six in ten adults exercise in public space, twice the share that use a gym or leisure centre</h3>
+          <p class="how"><strong>How to read:</strong> each figure is 1% of Australian adults (15+). People could name more than one place, so the panels do not add up to 100. AusPlay's gym category also covers fitness clubs and sports or leisure centres.</p>
+        </figcaption>
+        <div class="vis" data-spec="specs/01-venues-waffle.vl.json" data-anim="waffle"></div>
+        <p class="source">Source: AusPlay, January to December 2025, Table 7 (Australian Sports Commission, released 30 April 2026).</p>
+      </figure>
+
+      <figure class="card wide reveal" id="fig-02">
+        <figcaption>
+          <p class="fig-num">Charts 2 and 3</p>
+          <h3>Public space wins in every state, by 27 to 43 percentage points</h3>
+          <p class="how"><strong>How to read:</strong> on the map, each spike's height is the estimated number of adults in that state who exercised in public space, and its colour is their share of the state's adults. In the right panel, the gap between the dots is the lead public space has over the gym. Click a spike or a row, or pick a state from the menu below, to follow one state across both; double-click or choose "All states" to reset.</p>
+        </figcaption>
+        <div class="vis" data-spec="specs/02-states-spikes-dumbbell.vl.json" data-anim="spikes"></div>
+        <p class="source">Source: AusPlay 2025, state and territory tables, Table 7. NT and ACT estimates come from smaller samples and carry wider margins of error. Map: equal-area conic projection (standard parallels 18°S and 36°S).</p>
+      </figure>
+    </section>
+
+    <div class="hill-edge to-2" aria-hidden="true">
+      <svg viewBox="0 0 1600 110" preserveAspectRatio="none"><path class="back" d="M0,66 C220,28 430,74 650,46 S1070,16 1300,50 S1520,60 1600,38 L1600,110 L0,110Z"/><path class="front" d="M0,86 C260,56 500,102 820,76 S1300,52 1600,82 L1600,110 L0,110Z"/></svg>
+    </div>
+
+    <!-- SECTION 2 -->
+    <section class="chapter" id="s2">
+      <div class="chapter-head reveal">
+        <p class="chapter-num">02</p>
+        <h2>Who's out there</h2>
+        <p class="lede">The open-air gym is not one crowd. What people do changes with age, women and men use public space differently, and household income shapes how often anyone gets moving at all.</p>
+      </div>
+
+      <figure class="card wide reveal" id="fig-04">
+        <figcaption>
+          <p class="fig-num">Chart 4</p>
+          <h3>The gym is the young adult's favourite. From 35, walking takes over</h3>
+          <p class="how"><strong>How to read:</strong> each line is one activity. Within each age group, the activities are ranked among these eight: the most popular sits at the top and the least popular at the bottom; age runs left to right from teenagers to over-65s. The x axis is life stage, not time. Hover a line to follow it.</p>
+        </figcaption>
+        <div class="vis" data-spec="specs/04-activity-bump.vl.json" data-anim="lines"></div>
+        <p class="source">Source: AusPlay 2025, Table 17: share of adults in each age group who did the activity at least once in the past year. Top eight activities overall.</p>
+      </figure>
+
+      <div class="row">
+        <figure class="card reveal" id="fig-05">
+          <figcaption>
+            <p class="fig-num">Chart 5</p>
+            <h3>Public space use peaks at 55 to 64 for women and men</h3>
+            <p class="how"><strong>How to read:</strong> bars show the share of each age group who exercised in public space, women on the left and men on the right. They are rates, not head counts. Teenage girls (66%) are far ahead of teenage boys (53%).</p>
+          </figcaption>
+          <div class="vis" data-spec="specs/05-public-space-pyramid.vl.json" data-anim="bars"></div>
+          <p class="source">Source: AusPlay 2025, Table 7, by sex and age. Estimates for 15 to 17 year olds come from smaller samples.</p>
+        </figure>
+        <figure class="card reveal" id="fig-06">
+          <figcaption>
+            <p class="fig-num">Chart 6</p>
+            <h3>Weekly exercise rises with household income, from 53% to 81%</h3>
+            <p class="how"><strong>How to read:</strong> each column is a household income band, its width is that band's share of adults, and the coloured blocks split it by how often people were active. Greens run from three or more times a week (darkest) to less than weekly (lightest); taupe is no activity at all in the past year. The "weekly" figure on each column adds the two darker greens.</p>
+          </figcaption>
+          <div class="vis" data-spec="specs/06-income-mosaic.vl.json" data-anim="bars"></div>
+          <p class="source">Source: AusPlay 2025, Table 1 (adults 18+; about 3.2 million adults who did not state their income are excluded). Column widths use AusPlay's estimated participant numbers divided by participation rates.</p>
+        </figure>
+      </div>
+
+      <figure class="card wide reveal" id="fig-07">
+        <figcaption>
+          <p class="fig-num">Chart 7</p>
+          <h3>Walking climbs with age until the mid-60s, while team sports fade from the teens</h3>
+          <p class="how"><strong>How to read:</strong> darker cells mean a larger share of that age group did the activity. The bars along the top show what share of each age group was active at all; the bars on the right show each activity's overall share.</p>
+        </figcaption>
+        <div class="vis" data-spec="specs/07-activity-age-heatmap.vl.json" data-anim="cells"></div>
+        <p class="source">Source: AusPlay 2025, Tables 7 and 17. Top twelve activities for adults (15+).</p>
+      </figure>
+    </section>
+
+    <div class="hill-edge to-3" aria-hidden="true">
+      <svg viewBox="0 0 1600 110" preserveAspectRatio="none"><path class="back" d="M0,58 C180,84 420,30 690,56 S1120,80 1340,44 S1540,36 1600,52 L1600,110 L0,110Z"/><path class="front" d="M0,84 C300,64 540,100 860,80 S1330,60 1600,90 L1600,110 L0,110Z"/></svg>
+    </div>
+
+    <!-- SECTION 3 -->
+    <section class="chapter" id="s3">
+      <div class="chapter-head reveal">
+        <p class="chapter-num">03</p>
+        <h2>Why, when and how</h2>
+        <p class="lede">Most adults are active at least partly on their own terms, not only through clubs. Health is the top reason to move, and being outdoors is among the top four. For people who stay inactive, the weather is rarely the problem. The seasons still set the rhythm, and each capital runs on a different calendar.</p>
+      </div>
+
+
+      <figure class="card wide reveal" id="fig-08">
+        <figcaption>
+          <p class="fig-num">Chart 8</p>
+          <h3>Four in ten adults keep fit entirely on their own terms. Only 7% are active through organised activity alone</h3>
+          <p class="how"><strong>How to read:</strong> each band carries people from their age group (left) to how they were active in 2025 (right); the thicker the band, the more people. "Informal" means on their own or with family and friends; "organised" means through a club, gym, business, coach or other group. Each adult appears once. Hover a band or block to follow it.</p>
+        </figcaption>
+        <div class="vis" data-spec="specs/08-organised-sankey.vg.json" data-anim="flows"></div>
+        <p class="source">Source: AusPlay 2025, Table 3 (organisational nature of activity), adults 15+. Adult numbers per age group are AusPlay's participant estimates divided by participation rates. About 113,000 adults (0.5% of adults) who were unsure how their activity was organised are not shown.</p>
+      </figure>
+
+      <div class="row">
+        <figure class="card reveal" id="fig-09">
+          <figcaption>
+            <p class="fig-num">Chart 9</p>
+            <h3>Half of active adults exercise partly to be outdoors</h3>
+            <p class="how"><strong>How to read:</strong> each stem is the share of active adults who gave that reason for at least one of their activities. The menu below the chart starts on "All ages"; pick an age group to see how the reasons shift.</p>
+          </figcaption>
+          <div class="vis" data-spec="specs/09-motivations-lollipop.vl.json" data-anim="bars"></div>
+          <p class="source">Source: AusPlay 2025, Table 12. Base: adults who did at least one activity. People could give several reasons.</p>
+        </figure>
+        <figure class="card reveal" id="fig-10">
+          <figcaption>
+            <p class="fig-num">Chart 10</p>
+            <h3>For inactive adults, health and age matter far more than weather</h3>
+            <p class="how"><strong>How to read:</strong> bars show the share of adults who did no sport or physical activity in the past year who gave each reason. Coral bars are the outdoor-related reasons.</p>
+          </figcaption>
+          <div class="vis" data-spec="specs/10-barriers.vl.json" data-anim="bars"></div>
+          <p class="source">Source: AusPlay 2025, Table 13. Base: adults who did no sport or physical activity in the past 12 months.</p>
+        </figure>
+      </div>
+
+      <figure class="card wide reveal" id="fig-11">
+        <figcaption>
+          <p class="fig-num">Chart 11</p>
+          <h3>Every capital has its own outdoor season</h3>
+          <p class="how"><strong>How to read:</strong> each flower is one city's year, starting with January at the top and running clockwise. A petal's size (its area) shows the average number of days in that month: coral for hot days of 30 °C or more, blue for rain days, light blue for cold mornings of 2 °C or less. The faint rings mark 10, 20 and 30 days. Petals overlap rather than stack, because a hot day can also be a rain day. Choose one kind of day from the Show menu below the chart.</p>
+        </figcaption>
+        <div class="vis" data-spec="specs/11-climate-rose.vl.json" data-anim="petals"></div>
+        <p class="source">Source: Bureau of Meteorology, Climate statistics for Australian locations (monthly means). Stations and record periods differ: Darwin Airport 1941 to 2026, Brisbane 1999 to 2026, Perth Metro 1994 to 2026, Sydney Airport 1939 to 2026, Adelaide West Terrace 1887 to 2026, Canberra Airport 2008 to 2026, Melbourne Olympic Park 2013 to 2026, Hobart Ellerslie Road 1882 to 2026. Rain records at some stations start in a different year from temperature records (hover a petal to see both). Long-term averages, not 2025 weather.</p>
+      </figure>
+
+      <div class="row">
+        <figure class="card reveal" id="fig-12">
+          <figcaption>
+            <p class="fig-num">Chart 12</p>
+            <h3>Young adults train to music. For <span class="nowrap">over-65s</span>, wearables are the top tech</h3>
+            <p class="how"><strong>How to read:</strong> each line joins the share of active 18 to 24 year olds using a technology (left) to the share of active over-65s (right). Steep lines are generational habits; flatter lines are tools all ages keep.</p>
+          </figcaption>
+          <div class="vis" data-spec="specs/12-tech-slope.vl.json" data-anim="lines"></div>
+          <p class="source">Source: AusPlay 2025, Table 11. Base: active adults in each age group.</p>
+        </figure>
+        <figure class="card reveal" id="fig-13">
+          <figcaption>
+            <p class="fig-num">Chart 13</p>
+            <h3>Half of adults are active three or more times a week</h3>
+            <p class="how"><strong>How to read:</strong> each bar is the share of all adults who were active at least that often. Bars shrink to the right because each step is harder to reach.</p>
+          </figcaption>
+          <div class="vis" data-spec="specs/13-frequency.vl.json" data-anim="bars"></div>
+          <p class="source">Source: AusPlay 2025, Table 9. All adults (15+).</p>
+        </figure>
+      </div>
+    </section>
+
+    <div class="hill-edge to-4" aria-hidden="true">
+      <svg viewBox="0 0 1600 110" preserveAspectRatio="none"><path class="back" d="M0,62 C240,34 460,80 720,52 S1150,26 1380,58 S1550,66 1600,46 L1600,110 L0,110Z"/><path class="front" d="M0,90 C280,62 520,98 800,74 S1280,56 1600,86 L1600,110 L0,110Z"/></svg>
+    </div>
+
+    <!-- SECTION 4 -->
+    <section class="chapter" id="s4">
+      <div class="chapter-head reveal">
+        <p class="chapter-num">04</p>
+        <h2>Room to move</h2>
+        <p class="lede">If public space is Australia's biggest gym, where is the equipment and where is the space? Two datasets answer two different questions here, and they are not equally complete.</p>
+      </div>
+
+      <aside class="caveat reveal" role="note">
+        <p class="caveat-title">Read this first: two kinds of map</p>
+        <p><strong>Outdoor gyms (charts 14 and 15)</strong> come from OpenStreetMap, kept up by volunteers, so they show <em>mapped</em> outdoor gyms, not every one that exists. Only about a third of the sites in the City of Gold Coast's own 2015 Fitness Stations list appear on it, and mapping effort likely differs between places. Use these maps to see where mapped gyms cluster, not to compare councils.</p>
+        <p><strong>Park space (charts 16 to 18)</strong> comes from official ABS land-use and population data, which covers every council. It measures how much local parkland exists per resident, not how good, safe or reachable it is.</p>
+      </aside>
+
+      <figure class="card wide reveal" id="fig-14">
+        <figcaption>
+          <p class="fig-num">Chart 14</p>
+          <h3>Mapped outdoor gyms hug the coast. About 7 in 10 are in the capital cities</h3>
+          <p class="how"><strong>How to read:</strong> each coral dot is one mapped outdoor gym site (machines within 60 m of each other count as one site); about 7 in 10 sites sit in the eight capital-city areas. Hover a dot for its name and council. Gaps can mean no equipment or simply that nobody has mapped it yet.</p>
+        </figcaption>
+        <div class="vis" data-spec="specs/14-osm-dot-map.vl.json" data-anim="dots"></div>
+        <p class="source">Source: OpenStreetMap contributors, features tagged leisure=fitness_station, snapshot 24 October 2026 (Open Database Licence). Not a complete inventory. Map: equal-area conic projection.</p>
+      </figure>
+
+      <figure class="card wide reveal" id="fig-15">
+        <figcaption>
+          <p class="fig-num">Charts 15 and 16</p>
+          <h3>Pick a city: where mapped gyms cluster, and where park space is tight</h3>
+          <p class="how"><strong>How to read:</strong> left, each hexagon covers about 6 km² and is coloured by the number of mapped outdoor gym sites inside it (1, 2, 3 to 4, or 5 or more; empty hexagons are not drawn). Right, each council is coloured by its local parkland per resident in m²: darker green means more room, gold means under 20 m², and grey "None" means the council has no parkland mesh block of 50 hectares or less. Choose a city from the menu under the maps, and drag the slider beside it to hide hexagons with fewer mapped sites than you pick. Canberra is left out because the ABS treats the whole ACT as a single council.</p>
+        </figcaption>
+        <div class="vis" data-spec="specs/15-city-hexbin-parks.vl.json" data-anim="cells"></div>
+        <p class="source">Sources: OpenStreetMap contributors (left, mapped sites only); ABS ASGS 2021 mesh block land use and ABS Regional population 2024-25 (right). Local parkland = ABS "Parkland" mesh blocks of 50 hectares or less; see Data &amp; method.</p>
+      </figure>
+
+      <figure class="card wide reveal" id="fig-17">
+        <figcaption>
+          <p class="fig-num">Chart 17</p>
+          <h3>Where most Australians live, local park space is tightest</h3>
+          <p class="how"><strong>How to read:</strong> every council is a circle placed near its real location, sized by how many people live there (see the size key, bottom right) and coloured by local parkland per resident. Big empty councils shrink and big cities swell, so the map shows people rather than land. Grey circles have no parkland mesh block of 50 hectares or less; this is common in remote councils, where parkland blocks tend to be larger and are left out. Drag the two sliders above the map to keep only councils within a population range: the rest fade to outlines, and the note at the top left counts the councils left and their share of Australians. Hover a circle for details.</p>
+        </figcaption>
+        <div class="vis" data-spec="specs/17-council-dorling.vg.json" data-anim="circles"></div>
+        <p class="source">Sources: ABS Regional population 2024-25 (30 June 2025) and ABS ASGS 2021 mesh block land use. Circle positions are precomputed in the build script: council centres are projected, then nudged apart so circles do not overlap.</p>
+      </figure>
+
+      <figure class="card wide reveal" id="fig-18">
+        <figcaption>
+          <p class="fig-num">Chart 18</p>
+          <h3>Park space follows density, not disadvantage</h3>
+          <p class="how"><strong>How to read:</strong> each dot is one capital-city council, placed by its local parkland per resident on a log scale: equal distances mean equal multiples (5, 10, 20, 50 and so on). Rows group councils from most disadvantaged (top) to least (bottom); the black tick is each row's median. Shades of blue show population density: darkest for the densest (inner) councils, palest for the most spread out. Hover a dot for its name.</p>
+        </figcaption>
+        <div class="vis" data-spec="specs/18-park-swarm.vl.json" data-anim="circles"></div>
+        <p class="source">Sources: ABS SEIFA 2021 (Index of Relative Socio-economic Disadvantage, national deciles grouped into fifths); ABS Regional population 2024-25; ABS ASGS 2021 mesh block land use. 135 councils that are mostly inside a capital city.</p>
+      </figure>
+    </section>
+
+    <!-- DUSK: the page ends at evening in the park, mirroring the dawn hero -->
+    <div class="dusk-top" aria-hidden="true">
+      <div class="dusk-sun"></div>
+      <svg viewBox="0 0 1600 150" preserveAspectRatio="none">
+        <path d="M0,96 C180,62 380,100 600,74 S1020,42 1250,76 S1500,88 1600,64 L1600,150 L0,150Z" fill="#2E6150"/>
+        <path d="M0,118 C240,88 470,130 770,102 S1250,78 1600,108 L1600,150 L0,150Z" fill="#173B36"/>
+      </svg>
+    </div>
+
+    <div class="dusk">
+      <div class="fireflies" aria-hidden="true">
+        <span style="--x: 3%; --y: 8%; --t: 7s"></span><span style="--x: 6%; --y: 30%; --t: 9s"></span>
+        <span style="--x: 2%; --y: 55%; --t: 8s"></span><span style="--x: 5%; --y: 80%; --t: 10s"></span>
+        <span style="--x: 95%; --y: 14%; --t: 8.5s"></span><span style="--x: 97%; --y: 38%; --t: 7.5s"></span>
+        <span style="--x: 94%; --y: 62%; --t: 9.5s"></span><span style="--x: 96%; --y: 86%; --t: 8s"></span>
+      </div>
+
+      <section class="closing reveal" aria-labelledby="closing-title">
+        <p class="closing-kicker">What it adds up to</p>
+        <h2 id="closing-title">Australia's favourite gym has no doors. <em>Keeping it open means keeping room to move.</em></h2>
+        <div class="closing-body">
+          <p>Most adults use public space to stay active, and that habit grows with age until the mid-60s. But who gets moving still tracks money: weekly activity rises steeply with household income. Space is a different story. Across the capital cities, local park space per resident is only weakly related to how disadvantaged a council is, and much more closely tied to density. Several of the tightest councils are among the least disadvantaged inner suburbs, while outer suburbs have more room per person.</p>
+          <p>Keeping the open-air gym open means protecting local parkland where people are packing in, and making it easy for everyone, at every income, to use the space they already have.</p>
+        </div>
+      </section>
+
+    <!-- ABOUT -->
+    <section class="about" id="about">
+      <h2>Data &amp; method</h2>
+      <div class="about-grid">
+        <div>
+          <h3>What "local parkland" means here</h3>
+          <p>The ABS sorts every mesh block, Australia's smallest statistical area, by its main land use. This page counts mesh blocks classed as <strong>Parkland</strong> that are <strong>50 hectares (0.5 km²) or smaller</strong> as local parkland, then divides that area by each council's population. Larger parkland blocks are mostly regional parks, bushland reserves and national parks, which would make fringe councils look park-rich even when little of that land is a short walk from home. The cut-off applies to the size of the mesh block, not the size of the park, and small parks inside mesh blocks classed as residential are not counted.</p>
+          <p>The cut-off is a judgement, so the finding was checked at 20 hectares, 50 hectares and 2 km². Across the 135 capital-city councils, park space per resident barely relates to disadvantage at any cut-off (rank correlation between −0.05 and −0.20), but it falls clearly as councils get denser (between −0.56 and −0.86; −0.75 at the 50 hectare cut-off used on this page). A rank correlation runs from −1 to 1; values near 0 mean no consistent link.</p>
+          <p>Land use is from the 2021 ABS mesh blocks; population is the ABS estimate for 30 June 2025. Parks rarely change quickly, but new estates since 2021 are not reflected. Parkland covers parks, reserves and sports grounds of every kind; it does not tell you whether a space is accessible, safe, shaded or well kept, and nearby land in a neighbouring council is not counted.</p>
+        </div>
+        <div>
+          <h3>Other things to know</h3>
+          <ul>
+            <li><strong>AusPlay</strong> is the national sport and physical activity survey run by the Australian Sports Commission. Answers are self-reported for the past 12 months, and small groups (NT, ACT, 15 to 17 year olds) carry wider margins of error. AusPlay moved from phone to online in 2023, so these figures cannot be compared with releases before then. The next release (July 2025 to June 2026) is scheduled for late October 2026.</li>
+            <li><strong>"Public space"</strong> is one of AusPlay's own categories for where an activity was done. This page describes it with everyday examples such as parks, streets and beaches; those examples are ours, not AusPlay's. It is not a measure of outdoor gym use.</li>
+            <li><strong>OpenStreetMap</strong> outdoor gyms are a volunteer-mapped snapshot (24 October 2026): 2,174 features merged into 1,745 sites. They are shown only as mapped locations.</li>
+            <li><strong>SEIFA</strong> scores are from 2021; 545 of 548 councils matched the 2025 boundaries (Merri-bek uses its former Moreland score; two NT councils have none: Groote Archipelago, created in 2023, and East Arnhem, whose boundaries changed at the same time).</li>
+            <li><strong>Climate</strong> figures are long-term monthly averages for one weather station per capital, over different periods.</li>
+            <li>Maps use an equal-area conic projection centred on Australia (standard parallels 18°S and 36°S), so areas are compared fairly.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Sources</h3>
+      <ol class="sources">
+        <li>Australian Sports Commission (2026). <em>AusPlay survey results January 2025 to December 2025</em>, national and state data tables, released 30 April 2026. © Australian Sports Commission. <a href="https://www.ausport.gov.au/clearinghouse/research/ausplay/results">ausport.gov.au</a></li>
+        <li>Australian Bureau of Statistics (2026). <em>Regional population, 2024-25</em>, estimated resident population by Local Government Area (2025 boundaries). CC BY 4.0. <a href="https://geo.abs.gov.au/arcgis/rest/services/Hosted/LGA_Regional_Population_2025/FeatureServer/1">ABS feature service</a></li>
+        <li>Australian Bureau of Statistics (2021, 2025). <em>Australian Statistical Geography Standard Edition 3</em>: Mesh Block 2021 and Local Government Area 2025 allocation files. CC BY 4.0. <a href="https://www.abs.gov.au/statistics/standards/australian-statistical-geography-standard-asgs-edition-3/jul2021-jun2026/access-and-downloads/allocation-files">abs.gov.au</a></li>
+        <li>Australian Bureau of Statistics (2021). <em>Australian Statistical Geography Standard Edition 3</em>: State and Territory 2021 boundaries (state outlines on charts 2, 14 and 17). CC BY 4.0. <a href="https://www.abs.gov.au/statistics/standards/australian-statistical-geography-standard-asgs-edition-3/jul2021-jun2026/access-and-downloads/digital-boundary-files">abs.gov.au</a></li>
+        <li>Australian Bureau of Statistics (2023). <em>Socio-Economic Indexes for Areas (SEIFA), Australia, 2021</em>, Local Government Area indexes. CC BY 4.0. <a href="https://www.abs.gov.au/statistics/people/people-and-communities/socio-economic-indexes-areas-seifa-australia/2021">abs.gov.au</a></li>
+        <li>Bureau of Meteorology. <em>Climate statistics for Australian locations</em>, monthly statistics for stations 014015, 040913, 009225, 066037, 023000, 070351, 086338 and 094029, accessed 25 October 2026. © Commonwealth of Australia, Bureau of Meteorology. <a href="http://www.bom.gov.au/climate/averages/tables/cw_040913_All.shtml">bom.gov.au</a></li>
+        <li>OpenStreetMap contributors (2026). Features tagged leisure=fitness_station in Australia, snapshot 24 October 2026, via the Overpass API. Data available under the <a href="https://www.openstreetmap.org/copyright">Open Database Licence</a>.</li>
+        <li>City of Gold Coast (2015). <em>Fitness Stations</em>, used only to check how complete the OpenStreetMap data is. CC BY 3.0 AU, via <a href="https://data.gov.au/">data.gov.au</a>.</li>
+        <li>Vega, Vega-Lite and Vega-Embed (University of Washington Interactive Data Lab). Unit references: FIT3179 Week 8 to 10 studio materials and <a href="https://fit3179.github.io/Vega-Lite/">fit3179.github.io/Vega-Lite</a>. Chart 17: idea adapted from the Vega example gallery "Dorling Cartogram", with circle positions precomputed in this project's build script instead of a live force simulation.</li>
+        <li>Fonts: Besley (Owen Earl) and DM Sans (Colophon Foundry), via Google Fonts, SIL Open Font Licence. All illustrations on this page are drawn in code for this project.</li>
+      </ol>
+
+      <p class="credit">Made by Nithin Mangalath for FIT3179 Data Visualisation, Monash University, 25 October 2026. Every chart's Vega or Vega-Lite specification is in the <code>specs</code> folder of this page's GitHub repository.</p>
+      <p class="ai-note">Generative AI tools assisted with research, chart design, coding and data-preparation scripts, and drafting and editing text.</p>
+    </section>
+    </div>
+  </main>
+
+  <script defer src="js/main.js?v=2026-10-27"></script>
+</body>
+</html>

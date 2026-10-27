@@ -1,0 +1,224 @@
+{
+  "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "description": "Chart 8. Sankey diagram: adults flow from their age group (left) to how they were active in 2025 (right). Band thickness = estimated number of adults. The four groups on the right do not overlap, so each adult is counted once. AusPlay 2025, Table 3. Node and band positions are laid out in scripts/build_data.py; Vega's linkpath transform draws the curved bands.",
+  "width": 900,
+  "height": 460,
+  "autosize": "none",
+  "padding": 5,
+  "signals": [
+    {
+      "name": "active",
+      "value": null,
+      "on": [
+        {
+          "events": "@link:pointerover",
+          "update": "datum.target"
+        },
+        {
+          "events": "@node:pointerover",
+          "update": "datum.name"
+        },
+        {
+          "events": "@link:pointerout, @node:pointerout",
+          "update": "null"
+        }
+      ]
+    }
+  ],
+  "data": [
+    {
+      "name": "nodes",
+      "url": "data/sankey_organised.json",
+      "format": {
+        "type": "json",
+        "property": "nodes"
+      }
+    },
+    {
+      "name": "links",
+      "url": "data/sankey_organised.json",
+      "format": {
+        "type": "json",
+        "property": "links"
+      },
+      "transform": [
+        {
+          "type": "linkpath",
+          "orient": "horizontal",
+          "shape": "diagonal",
+          "sourceX": "sx",
+          "sourceY": "sy",
+          "targetX": "tx",
+          "targetY": "ty"
+        }
+      ]
+    }
+  ],
+  "scales": [
+    {
+      "name": "color",
+      "type": "ordinal",
+      "domain": [
+        "Informal only",
+        "Mix of informal and organised",
+        "Organised only",
+        "Not active in 2025"
+      ],
+      "range": [
+        "#1F5C45",
+        "#5FAE85",
+        "#9CCFB0",
+        "#A3968A"
+      ]
+    }
+  ],
+  "marks": [
+    {
+      "name": "link",
+      "type": "path",
+      "from": {
+        "data": "links"
+      },
+      "encode": {
+        "enter": {
+          "path": {
+            "field": "path"
+          },
+          "stroke": {
+            "scale": "color",
+            "field": "target"
+          },
+          "strokeWidth": {
+            "field": "width"
+          },
+          "strokeCap": {
+            "value": "butt"
+          },
+          "tooltip": {
+            "signal": "{'Age group': datum.source, 'How active': datum.target, 'Adults': format(datum.value, ',.0f'), 'Share of the age group': format(datum.share_of_age, '.0%')}"
+          }
+        },
+        "update": {
+          "strokeOpacity": {
+            "signal": "active == null ? 0.42 : (active == datum.target || active == datum.source) ? 0.8 : 0.08"
+          }
+        }
+      },
+      "aria": false
+    },
+    {
+      "name": "node",
+      "type": "rect",
+      "from": {
+        "data": "nodes"
+      },
+      "encode": {
+        "enter": {
+          "x": {
+            "field": "x0"
+          },
+          "x2": {
+            "field": "x1"
+          },
+          "y": {
+            "field": "y0"
+          },
+          "y2": {
+            "field": "y1"
+          },
+          "fill": {
+            "signal": "datum.side == 'right' ? scale('color', datum.name) : '#1B2A41'"
+          },
+          "cornerRadius": {
+            "value": 2
+          },
+          "cursor": {
+            "value": "pointer"
+          },
+          "tooltip": {
+            "signal": "{'Group': datum.name, 'Adults': format(datum.value, ',.0f'), 'Share of all adults': format(datum.share, '.0%')}"
+          }
+        }
+      },
+      "aria": false
+    },
+    {
+      "type": "text",
+      "from": {
+        "data": "nodes"
+      },
+      "interactive": false,
+      "encode": {
+        "enter": {
+          "x": {
+            "signal": "datum.side == 'left' ? datum.x0 - 10 : datum.x1 + 12"
+          },
+          "y": {
+            "signal": "(datum.y0 + datum.y1) / 2 - (datum.side == 'right' ? 8 : 0)"
+          },
+          "align": {
+            "signal": "datum.side == 'left' ? 'right' : 'left'"
+          },
+          "baseline": {
+            "value": "middle"
+          },
+          "text": {
+            "signal": "datum.side == 'left' ? datum.name : datum.label"
+          },
+          "font": {
+            "value": "'DM Sans', system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
+          },
+          "fontSize": {
+            "signal": "datum.side == 'left' ? 13 : 14"
+          },
+          "fontWeight": {
+            "value": 800
+          },
+          "fill": {
+            "value": "#1B2A41"
+          }
+        }
+      },
+      "aria": false
+    },
+    {
+      "type": "text",
+      "from": {
+        "data": "nodes"
+      },
+      "interactive": false,
+      "encode": {
+        "enter": {
+          "x": {
+            "signal": "datum.side == 'left' ? datum.x0 - 10 : datum.x1 + 12"
+          },
+          "y": {
+            "signal": "(datum.y0 + datum.y1) / 2 + (datum.side == 'right' ? 10 : 14)"
+          },
+          "align": {
+            "signal": "datum.side == 'left' ? 'right' : 'left'"
+          },
+          "baseline": {
+            "value": "middle"
+          },
+          "text": {
+            "field": "sublabel"
+          },
+          "font": {
+            "value": "'DM Sans', system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
+          },
+          "fontSize": {
+            "value": 11.5
+          },
+          "fontWeight": {
+            "value": 500
+          },
+          "fill": {
+            "value": "#5D6B7A"
+          }
+        }
+      },
+      "aria": false
+    }
+  ]
+}

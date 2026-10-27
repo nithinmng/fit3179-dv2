@@ -1,0 +1,311 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Charts 15 and 16, sharing one city menu. Left: hexbin map of mapped outdoor gym sites (OpenStreetMap, hexagons about 6 km2). A slider hides hexagons with fewer than the chosen number of sites. Right: choropleth of local parkland per resident by council (ABS 2021 mesh block land use, parkland blocks of 50 ha or less, divided by ABS 2025 population).",
+  "params": [
+    {
+      "name": "city",
+      "value": "Sydney",
+      "bind": {
+        "input": "select",
+        "options": [
+          "Sydney",
+          "Melbourne",
+          "Brisbane",
+          "Perth",
+          "Adelaide",
+          "Hobart",
+          "Darwin"
+        ],
+        "name": "City "
+      }
+    },
+    {
+      "name": "min_sites",
+      "value": 1,
+      "bind": {
+        "input": "range",
+        "min": 1,
+        "max": 8,
+        "step": 1,
+        "name": "Minimum sites per hexagon "
+      }
+    }
+  ],
+  "spacing": 36,
+  "resolve": {
+    "scale": {
+      "color": "independent"
+    },
+    "legend": {
+      "color": "independent"
+    }
+  },
+  "hconcat": [
+    {
+      "width": 440,
+      "height": 420,
+      "title": {
+        "text": "Mapped outdoor gyms",
+        "subtitle": "OpenStreetMap sites in each hexagon (about 6 km²)",
+        "offset": 30
+      },
+      "projection": {
+        "type": "conicEqualArea",
+        "parallels": [
+          -18,
+          -36
+        ],
+        "rotate": [
+          -132,
+          0
+        ]
+      },
+      "layer": [
+        {
+          "data": {
+            "url": "data/city_councils.json",
+            "format": {
+              "type": "json",
+              "property": "features"
+            }
+          },
+          "transform": [
+            {
+              "filter": "datum.properties.city == city"
+            }
+          ],
+          "mark": {
+            "type": "geoshape",
+            "fill": "#EAE4D8",
+            "stroke": "#CDBFA6",
+            "strokeWidth": 0.8
+          }
+        },
+        {
+          "data": {
+            "url": "data/osm_city_hexes.json",
+            "format": {
+              "type": "json",
+              "property": "features"
+            }
+          },
+          "transform": [
+            {
+              "filter": "datum.properties.city == city"
+            },
+            {
+              "filter": "datum.properties.sites >= min_sites"
+            },
+            {
+              "calculate": "datum.properties.sites >= 5 ? '5 or more' : datum.properties.sites >= 3 ? '3 to 4' : datum.properties.sites == 2 ? '2' : '1'",
+              "as": "site_class"
+            }
+          ],
+          "mark": {
+            "type": "geoshape",
+            "stroke": "#FFFDF8",
+            "strokeWidth": 0.7
+          },
+          "encoding": {
+            "color": {
+              "field": "site_class",
+              "type": "ordinal",
+              "title": "Mapped sites per hexagon",
+              "sort": [
+                "1",
+                "2",
+                "3 to 4",
+                "5 or more"
+              ],
+              "scale": {
+                "domain": [
+                  "1",
+                  "2",
+                  "3 to 4",
+                  "5 or more"
+                ],
+                "range": [
+                  "#F6C77E",
+                  "#EE9A4D",
+                  "#D9602B",
+                  "#9E3511"
+                ]
+              },
+              "legend": {
+                "orient": "bottom",
+                "direction": "horizontal",
+                "symbolType": "square"
+              }
+            },
+            "tooltip": [
+              {
+                "field": "properties.sites",
+                "title": "Mapped outdoor gym sites"
+              }
+            ]
+          }
+        },
+        {
+          "data": {
+            "url": "data/osm_city_hexes.json",
+            "format": {
+              "type": "json",
+              "property": "features"
+            }
+          },
+          "transform": [
+            {
+              "filter": "datum.properties.city == city"
+            },
+            {
+              "calculate": "datum.properties.sites >= min_sites ? 1 : 0",
+              "as": "shown"
+            },
+            {
+              "aggregate": [
+                {
+                  "op": "count",
+                  "as": "n"
+                },
+                {
+                  "op": "sum",
+                  "field": "shown",
+                  "as": "n_shown"
+                }
+              ]
+            },
+            {
+              "calculate": "min_sites == 1 ? 'All ' + datum.n + ' hexagons with a mapped site' : datum.n_shown + ' of ' + datum.n + ' hexagons have ' + min_sites + ' or more sites'",
+              "as": "label"
+            }
+          ],
+          "mark": {
+            "type": "text",
+            "align": "left",
+            "baseline": "top",
+            "fontSize": 13,
+            "fontWeight": 800,
+            "color": "#1B2A41"
+          },
+          "encoding": {
+            "x": {
+              "value": 0
+            },
+            "y": {
+              "value": -21
+            },
+            "text": {
+              "field": "label"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "width": 440,
+      "height": 420,
+      "title": {
+        "text": "Local park space per resident",
+        "subtitle": "Council parkland in blocks of 50 ha or less, m² per person",
+        "offset": 30
+      },
+      "projection": {
+        "type": "conicEqualArea",
+        "parallels": [
+          -18,
+          -36
+        ],
+        "rotate": [
+          -132,
+          0
+        ]
+      },
+      "data": {
+        "url": "data/city_councils.json",
+        "format": {
+          "type": "json",
+          "property": "features"
+        }
+      },
+      "transform": [
+        {
+          "filter": "datum.properties.city == city"
+        },
+        {
+          "calculate": "datum.properties.park_m2_pp == 0 ? 'None' : datum.properties.park_m2_pp < 20 ? 'Under 20' : datum.properties.park_m2_pp < 40 ? '20 to 40' : datum.properties.park_m2_pp < 70 ? '40 to 70' : datum.properties.park_m2_pp < 120 ? '70 to 120' : '120 or more'",
+          "as": "park_class"
+        }
+      ],
+      "mark": {
+        "type": "geoshape",
+        "stroke": "#FFFDF8",
+        "strokeWidth": 0.9
+      },
+      "encoding": {
+        "color": {
+          "field": "park_class",
+          "type": "ordinal",
+          "title": "Local park per resident (m²)",
+          "sort": [
+            "None",
+            "Under 20",
+            "20 to 40",
+            "40 to 70",
+            "70 to 120",
+            "120 or more"
+          ],
+          "scale": {
+            "domain": [
+              "None",
+              "Under 20",
+              "20 to 40",
+              "40 to 70",
+              "70 to 120",
+              "120 or more"
+            ],
+            "range": [
+              "#CFC8BD",
+              "#EBC77E",
+              "#CFE3B2",
+              "#8DC594",
+              "#3F8C64",
+              "#1F5C45"
+            ]
+          },
+          "legend": {
+            "orient": "bottom",
+            "direction": "horizontal",
+            "symbolType": "square",
+            "columns": 3
+          }
+        },
+        "tooltip": [
+          {
+            "field": "properties.council",
+            "title": "Council"
+          },
+          {
+            "field": "properties.park_m2_pp",
+            "title": "Local park per resident (m²)",
+            "format": ",.0f"
+          },
+          {
+            "field": "properties.park_all_m2_pp",
+            "title": "All parkland per resident (m²)",
+            "format": ","
+          },
+          {
+            "field": "properties.pop",
+            "title": "People (2025)",
+            "format": ","
+          },
+          {
+            "field": "properties.density",
+            "title": "People per km²",
+            "format": ",.0f"
+          }
+        ]
+      }
+    }
+  ]
+}

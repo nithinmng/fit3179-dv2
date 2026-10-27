@@ -1,0 +1,361 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Chart 11. Nightingale rose small multiples: average hot days (30 °C or more), rain days (1 mm or more) and cold mornings (2 °C or less) per month in each capital. Petals for the three kinds overlap (they are not stacked) because one day can count in more than one kind. BOM monthly climate statistics.",
+  "data": {
+    "url": "data/climate_rose.json"
+  },
+  "transform": [
+    {
+      "calculate": "datum.m",
+      "as": "t0"
+    },
+    {
+      "calculate": "datum.m + 1",
+      "as": "t1"
+    },
+    {
+      "calculate": "datum.m + 0.5",
+      "as": "tm"
+    },
+    {
+      "calculate": "{'Darwin': 0, 'Brisbane': 1, 'Perth': 2, 'Sydney': 3, 'Adelaide': 4, 'Canberra': 5, 'Melbourne': 6, 'Hobart': 7}[datum.city]",
+      "as": "city_order"
+    }
+  ],
+  "facet": {
+    "field": "city",
+    "type": "nominal",
+    "sort": {
+      "field": "city_order"
+    },
+    "header": {
+      "title": null,
+      "labelFontSize": 15,
+      "labelFontWeight": 800,
+      "labelColor": "#1B2A41",
+      "labelPadding": 2
+    }
+  },
+  "columns": 4,
+  "spacing": {
+    "row": 18,
+    "column": 34
+  },
+  "resolve": {
+    "scale": {
+      "theta": "shared",
+      "radius": "shared"
+    }
+  },
+  "spec": {
+    "width": 190,
+    "height": 190,
+    "layer": [
+      {
+        "transform": [
+          {
+            "filter": "datum.m == 0 && datum.kind == 'Hot days (30 °C or more)'"
+          },
+          {
+            "calculate": "[10, 20, 30]",
+            "as": "ring"
+          },
+          {
+            "flatten": [
+              "ring"
+            ]
+          },
+          {
+            "calculate": "datum.ring - 0.35",
+            "as": "ring_in"
+          }
+        ],
+        "mark": {
+          "type": "arc",
+          "color": "#D9CCB6",
+          "opacity": 0.9
+        },
+        "encoding": {
+          "theta": {
+            "datum": 0,
+            "type": "quantitative",
+            "scale": {
+              "domain": [
+                0,
+                12
+              ],
+              "range": [
+                0,
+                6.2832
+              ]
+            }
+          },
+          "theta2": {
+            "datum": 12
+          },
+          "radius": {
+            "field": "ring",
+            "type": "quantitative",
+            "scale": {
+              "type": "sqrt",
+              "zero": true,
+              "domain": [
+                0,
+                31
+              ],
+              "range": [
+                0,
+                92
+              ]
+            }
+          },
+          "radius2": {
+            "field": "ring_in"
+          }
+        }
+      },
+      {
+        "params": [
+          {
+            "name": "kind_pick",
+            "select": {
+              "type": "point",
+              "fields": [
+                "kind"
+              ]
+            },
+            "bind": {
+              "input": "select",
+              "name": "Show ",
+              "options": [
+                null,
+                "Hot days (30 °C or more)",
+                "Rain days (1 mm or more)",
+                "Cold mornings (2 °C or less)"
+              ],
+              "labels": [
+                "All three kinds of day",
+                "Hot days only",
+                "Rain days only",
+                "Cold mornings only"
+              ]
+            }
+          }
+        ],
+        "mark": {
+          "type": "arc",
+          "stroke": "#FFFDF8",
+          "strokeWidth": 1,
+          "padAngle": 0.012
+        },
+        "encoding": {
+          "theta": {
+            "field": "t0",
+            "type": "quantitative",
+            "scale": {
+              "domain": [
+                0,
+                12
+              ],
+              "range": [
+                0,
+                6.2832
+              ]
+            }
+          },
+          "theta2": {
+            "field": "t1"
+          },
+          "radius": {
+            "field": "days",
+            "type": "quantitative",
+            "scale": {
+              "type": "sqrt",
+              "zero": true,
+              "domain": [
+                0,
+                31
+              ],
+              "range": [
+                0,
+                92
+              ]
+            }
+          },
+          "color": {
+            "field": "kind",
+            "type": "nominal",
+            "title": null,
+            "scale": {
+              "domain": [
+                "Hot days (30 °C or more)",
+                "Rain days (1 mm or more)",
+                "Cold mornings (2 °C or less)"
+              ],
+              "range": [
+                "#E4572E",
+                "#2F5FB3",
+                "#79C4E6"
+              ]
+            },
+            "legend": {
+              "orient": "top",
+              "direction": "horizontal",
+              "symbolType": "circle",
+              "labelFontSize": 12.5,
+              "columnPadding": 22,
+              "labelLimit": 280
+            }
+          },
+          "order": {
+            "field": "days",
+            "sort": "descending"
+          },
+          "opacity": {
+            "condition": {
+              "param": "kind_pick",
+              "empty": true,
+              "value": 0.9
+            },
+            "value": 0.07
+          },
+          "tooltip": [
+            {
+              "field": "city",
+              "title": "City"
+            },
+            {
+              "field": "month",
+              "title": "Month"
+            },
+            {
+              "field": "kind",
+              "title": "Kind of day"
+            },
+            {
+              "field": "days",
+              "title": "Average days in month",
+              "format": ".1f"
+            },
+            {
+              "field": "max_c",
+              "title": "Average maximum (°C)",
+              "format": ".1f"
+            },
+            {
+              "field": "station",
+              "title": "Station"
+            },
+            {
+              "field": "years_temp",
+              "title": "Temperature records"
+            },
+            {
+              "field": "years_rain",
+              "title": "Rain records"
+            }
+          ]
+        }
+      },
+      {
+        "transform": [
+          {
+            "filter": "datum.kind == 'Hot days (30 °C or more)'"
+          }
+        ],
+        "mark": {
+          "type": "text",
+          "fontSize": 10.5,
+          "fontWeight": 700,
+          "color": "#6B6355"
+        },
+        "encoding": {
+          "theta": {
+            "field": "tm",
+            "type": "quantitative",
+            "scale": {
+              "domain": [
+                0,
+                12
+              ],
+              "range": [
+                0,
+                6.2832
+              ]
+            }
+          },
+          "radius": {
+            "value": 100
+          },
+          "text": {
+            "field": "month",
+            "type": "nominal"
+          }
+        }
+      },
+      {
+        "transform": [
+          {
+            "filter": "datum.m == 0 && datum.kind == 'Hot days (30 °C or more)' && datum.city == 'Hobart'"
+          },
+          {
+            "calculate": "[10, 20]",
+            "as": "ring"
+          },
+          {
+            "flatten": [
+              "ring"
+            ]
+          },
+          {
+            "calculate": "datum.ring + ' days'",
+            "as": "ring_label"
+          }
+        ],
+        "mark": {
+          "type": "text",
+          "fontSize": 9.5,
+          "color": "#6B6355",
+          "align": "left",
+          "dx": 3,
+          "baseline": "middle"
+        },
+        "encoding": {
+          "theta": {
+            "datum": 1.5,
+            "type": "quantitative",
+            "scale": {
+              "domain": [
+                0,
+                12
+              ],
+              "range": [
+                0,
+                6.2832
+              ]
+            }
+          },
+          "radius": {
+            "field": "ring",
+            "type": "quantitative",
+            "scale": {
+              "type": "sqrt",
+              "zero": true,
+              "domain": [
+                0,
+                31
+              ],
+              "range": [
+                0,
+                92
+              ]
+            }
+          },
+          "text": {
+            "field": "ring_label"
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Chart 10. Bar chart: reasons inactive adults gave for not taking part. Outdoor-related reasons highlighted. AusPlay 2025, Table 13.",
+  "width": 250,
+  "height": 360,
+  "data": {"url": "data/barriers.json"},
+  "transform": [
+    {"calculate": "indexof(['The weather', 'No opportunities or facilities nearby', \"No transport, can't get there\"], datum.barrier) >= 0", "as": "outdoor"}
+  ],
+  "encoding": {
+    "y": {"field": "barrier", "type": "nominal", "sort": null, "title": null, "axis": {"domain": false, "ticks": false, "labelFontSize": 12, "labelLimit": 230, "labelPadding": 8}},
+    "x": {"field": "rate", "type": "quantitative", "scale": {"domain": [0, 0.31]}, "axis": {"format": ".0%", "title": null, "values": [0, 0.1, 0.2, 0.3]}}
+  },
+  "layer": [
+    {
+      "mark": {"type": "bar", "cornerRadiusTopRight": 4, "cornerRadiusBottomRight": 4, "height": {"band": 0.7}},
+      "encoding": {
+        "color": {"condition": {"test": "datum.outdoor", "value": "#F0644A"}, "value": "#A9B8C8"},
+        "tooltip": [{"field": "barrier", "title": "Reason"}, {"field": "rate", "title": "Share of inactive adults", "format": ".1%"}]
+      }
+    },
+    {
+      "mark": {"type": "text", "align": "left", "dx": 5, "fontSize": 11, "fontWeight": 700},
+      "encoding": {
+        "text": {"field": "rate", "format": ".0%"},
+        "color": {"condition": {"test": "datum.outdoor", "value": "#B8321C"}, "value": "#3B4757"}
+      }
+    }
+  ]
+}

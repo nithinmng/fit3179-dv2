@@ -1,0 +1,88 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Chart 7. Heatmap of activity by age with marginal bars: top = share of each age group active at all (Table 7), right = each activity's overall share (Table 17). AusPlay 2025.",
+  "spacing": 8,
+  "vconcat": [
+    {
+      "width": 640,
+      "height": 70,
+      "data": {"url": "data/overall_age.json"},
+      "encoding": {
+        "x": {"field": "age", "type": "ordinal", "sort": ["15–17", "18–24", "25–34", "35–44", "45–54", "55–64", "65+"], "axis": null, "scale": {"paddingInner": 0.08}},
+        "y": {"field": "rate", "type": "quantitative", "scale": {"domain": [0, 1]}, "axis": null}
+      },
+      "layer": [
+        {
+          "name": "vbar_top",
+          "mark": {"type": "bar", "color": "#1F5C45", "cornerRadiusTopLeft": 4, "cornerRadiusTopRight": 4, "width": {"band": 0.5}},
+          "encoding": {"tooltip": [{"field": "age", "title": "Age"}, {"field": "rate", "title": "Active at all in 2025", "format": ".0%"}]}
+        },
+        {
+          "mark": {"type": "text", "dy": -7, "fontSize": 11, "fontWeight": 700, "color": "#1F5C45"},
+          "encoding": {"text": {"field": "rate", "format": ".0%"}}
+        }
+      ]
+    },
+    {
+      "spacing": 10,
+      "hconcat": [
+        {
+          "width": 640,
+          "height": 420,
+          "data": {"url": "data/activity_age.json"},
+          "encoding": {
+            "x": {"field": "age", "type": "ordinal", "sort": ["15–17", "18–24", "25–34", "35–44", "45–54", "55–64", "65+"], "title": "Age group", "axis": {"orient": "bottom", "labelAngle": 0, "domain": false, "ticks": false, "labelFontWeight": 700, "labelFontSize": 12.5}, "scale": {"paddingInner": 0.08}},
+            "y": {"field": "activity", "type": "nominal", "sort": ["Walking", "Gym and fitness", "Bushwalking", "Running", "Swimming", "Cycling", "Pilates", "Football (soccer)", "Yoga", "Tennis", "Golf", "Basketball"], "title": null, "axis": {"domain": false, "ticks": false, "labelFontSize": 12.5, "labelFontWeight": 600}, "scale": {"paddingInner": 0.08}}
+          },
+          "layer": [
+            {
+              "mark": {"type": "rect", "cornerRadius": 4},
+              "encoding": {
+                "color": {
+                  "field": "rate",
+                  "type": "quantitative",
+                  "title": "Share of age group",
+                  "scale": {"type": "sqrt", "domain": [0, 0.66], "range": ["#F6EEDF", "#BFE0C8", "#5FAE85", "#1F5C45", "#0E3426"]},
+                  "legend": {"format": ".0%", "orient": "bottom", "direction": "horizontal", "gradientLength": 260, "titleOrient": "left"}
+                },
+                "tooltip": [
+                  {"field": "activity", "title": "Activity"},
+                  {"field": "age", "title": "Age group"},
+                  {"field": "rate", "title": "Share who did it", "format": ".1%"}
+                ]
+              }
+            },
+            {
+              "transform": [{"filter": "datum.rate >= 0.1"}],
+              "mark": {"type": "text", "fontSize": 11.5, "fontWeight": 700},
+              "encoding": {
+                "text": {"field": "rate", "format": ".0%"},
+                "color": {"condition": {"test": "datum.rate >= 0.3", "value": "#FFFDF8"}, "value": "#1B2A41"}
+              }
+            }
+          ]
+        },
+        {
+          "width": 120,
+          "height": 420,
+          "data": {"url": "data/activity_age.json"},
+          "transform": [{"filter": "datum.age == '15–17'"}],
+          "encoding": {
+            "y": {"field": "activity", "type": "nominal", "sort": ["Walking", "Gym and fitness", "Bushwalking", "Running", "Swimming", "Cycling", "Pilates", "Football (soccer)", "Yoga", "Tennis", "Golf", "Basketball"], "axis": null, "scale": {"paddingInner": 0.08}},
+            "x": {"field": "total", "type": "quantitative", "scale": {"domain": [0, 0.6]}, "axis": null}
+          },
+          "layer": [
+            {
+              "mark": {"type": "bar", "color": "#6B7A8C", "cornerRadiusTopRight": 4, "cornerRadiusBottomRight": 4, "height": {"band": 0.5}},
+              "encoding": {"tooltip": [{"field": "activity", "title": "Activity"}, {"field": "total", "title": "All adults", "format": ".1%"}]}
+            },
+            {
+              "mark": {"type": "text", "align": "left", "dx": 5, "fontSize": 11, "fontWeight": 700, "color": "#3B4757"},
+              "encoding": {"text": {"field": "total", "format": ".0%"}}
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

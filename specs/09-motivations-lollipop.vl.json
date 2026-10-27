@@ -1,0 +1,33 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Chart 9. Lollipop chart: the ten most common reasons active adults gave for their activity, with an age-group menu. AusPlay 2025, Table 12.",
+  "width": 270,
+  "height": 330,
+  "data": {"url": "data/motivations.json"},
+  "params": [
+    {
+      "name": "age_pick",
+      "value": "All ages",
+      "bind": {"input": "select", "options": ["All ages", "15–17", "18–24", "25–34", "35–44", "45–54", "55–64", "65+"], "name": "Age group "}
+    }
+  ],
+  "transform": [
+    {"filter": "datum.age == age_pick"},
+    {"window": [{"op": "row_number", "as": "r"}], "sort": [{"field": "rate", "order": "descending"}]},
+    {"filter": "datum.r <= 10"},
+    {"calculate": "datum.motivation == 'Be outdoors, enjoy nature'", "as": "outdoors"}
+  ],
+  "encoding": {
+    "y": {"field": "motivation", "type": "nominal", "sort": "-x", "title": null, "axis": {"domain": false, "ticks": false, "labelFontSize": 12, "labelLimit": 210, "labelPadding": 8}},
+    "x": {"field": "rate", "type": "quantitative", "scale": {"domain": [0, 0.85]}, "axis": {"format": ".0%", "title": null, "values": [0, 0.2, 0.4, 0.6, 0.8]}},
+    "color": {"condition": {"test": "datum.outdoors", "value": "#F0644A"}, "value": "#6E86A3"}
+  },
+  "layer": [
+    {"mark": {"type": "rule", "strokeWidth": 3.5, "strokeCap": "round"}, "encoding": {"x2": {"datum": 0}}},
+    {
+      "mark": {"type": "circle", "size": 210, "opacity": 1, "stroke": "#FFFDF8", "strokeWidth": 2},
+      "encoding": {"tooltip": [{"field": "motivation", "title": "Reason"}, {"field": "age", "title": "Age group"}, {"field": "rate", "title": "Share of active adults", "format": ".1%"}]}
+    },
+    {"mark": {"type": "text", "align": "left", "dx": 11, "fontSize": 11.5, "fontWeight": 700}, "encoding": {"text": {"field": "rate", "format": ".0%"}, "color": {"condition": {"test": "datum.outdoors", "value": "#B8321C"}, "value": "#3B4757"}}}
+  ]
+}

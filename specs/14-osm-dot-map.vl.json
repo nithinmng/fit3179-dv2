@@ -1,0 +1,59 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Chart 14. Dot map: every outdoor gym site mapped on OpenStreetMap (leisure=fitness_station, snapshot 24 October 2026; features within 60 m merged into one site). Mapped sites only, not a complete inventory.",
+  "width": 760,
+  "height": 540,
+  "projection": {"type": "conicEqualArea", "parallels": [-18, -36], "rotate": [-132, 0]},
+  "layer": [
+    {
+      "data": {"url": "data/states.json", "format": {"type": "json", "property": "features"}},
+      "mark": {"type": "geoshape", "fill": "#E7E2D8", "stroke": "#FFFDF8", "strokeWidth": 1.4}
+    },
+    {
+      "data": {"url": "data/osm_sites.json", "format": {"type": "json", "property": "sites"}},
+      "transform": [{"calculate": "datum.name ? datum.name : 'Unnamed outdoor gym'", "as": "label"}],
+      "mark": {"type": "circle", "size": 20, "opacity": 0.75, "color": "#C9472F", "stroke": "#FFFDF8", "strokeWidth": 0.4},
+      "encoding": {
+        "longitude": {"field": "lon", "type": "quantitative"},
+        "latitude": {"field": "lat", "type": "quantitative"},
+        "tooltip": [
+          {"field": "label", "title": "Mapped outdoor gym"},
+          {"field": "council", "title": "Council"},
+          {"field": "state", "title": "State"}
+        ]
+      }
+    },
+    {
+      "data": {
+        "values": [
+          {"city": "Sydney", "n": 414, "lon": 151.2, "lat": -33.87, "side": "right"},
+          {"city": "Brisbane", "n": 268, "lon": 153.03, "lat": -27.47, "side": "right"},
+          {"city": "Melbourne", "n": 253, "lon": 143.9, "lat": -38.9, "side": "left"},
+          {"city": "Perth", "n": 127, "lon": 115.86, "lat": -31.95, "side": "left"},
+          {"city": "Adelaide", "n": 65, "lon": 138.6, "lat": -34.93, "side": "left"},
+          {"city": "Canberra", "n": 52, "lon": 150.5, "lat": -36.4, "side": "right"},
+          {"city": "Darwin", "n": 12, "lon": 130.84, "lat": -12.46, "side": "right"},
+          {"city": "Hobart", "n": 6, "lon": 147.33, "lat": -42.88, "side": "right"}
+        ]
+      },
+      "transform": [{"calculate": "datum.city + '  ' + datum.n", "as": "label"}],
+      "layer": [
+        {
+          "transform": [{"filter": "datum.side == 'right'"}],
+          "mark": {"type": "text", "align": "left", "dx": 14, "fontSize": 12.5, "fontWeight": 800, "color": "#1B2A41"},
+          "encoding": {"longitude": {"field": "lon", "type": "quantitative"}, "latitude": {"field": "lat", "type": "quantitative"}, "text": {"field": "label"}}
+        },
+        {
+          "transform": [{"filter": "datum.side == 'left'"}],
+          "mark": {"type": "text", "align": "right", "dx": -14, "fontSize": 12.5, "fontWeight": 800, "color": "#1B2A41"},
+          "encoding": {"longitude": {"field": "lon", "type": "quantitative"}, "latitude": {"field": "lat", "type": "quantitative"}, "text": {"field": "label"}}
+        }
+      ]
+    },
+    {
+      "data": {"values": [{"t": "1,745 mapped sites. 548 sit outside the eight capital cities."}]},
+      "mark": {"type": "text", "align": "left", "baseline": "top", "x": 4, "y": 4, "fontSize": 13, "fontWeight": 700, "color": "#9E3511"},
+      "encoding": {"text": {"field": "t"}}
+    }
+  ]
+}

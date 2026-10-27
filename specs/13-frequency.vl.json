@@ -1,0 +1,28 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Chart 13. Bar chart: share of all adults active at least as often as each step, from once a year to seven or more times a week. AusPlay 2025, Table 9.",
+  "width": 390,
+  "height": 300,
+  "data": {"url": "data/frequency.json"},
+  "encoding": {
+    "x": {"field": "threshold", "type": "ordinal", "sort": null, "title": null, "axis": {"labelAngle": -35, "domain": false, "ticks": false, "labelFontSize": 11.5, "labelFontWeight": 600}},
+    "y": {"field": "rate", "type": "quantitative", "scale": {"domain": [0, 1]}, "axis": {"format": ".0%", "title": null, "values": [0, 0.25, 0.5, 0.75, 1]}}
+  },
+  "layer": [
+    {
+      "name": "vbar_freq",
+      "mark": {"type": "bar", "cornerRadiusTopLeft": 5, "cornerRadiusTopRight": 5, "width": {"band": 0.72}},
+      "encoding": {
+        "color": {"condition": {"test": "datum.threshold == '3+ a week'", "value": "#1F5C45"}, "value": "#8DC594"},
+        "tooltip": [{"field": "threshold", "title": "Active at least"}, {"field": "rate", "title": "Share of adults", "format": ".1%"}]
+      }
+    },
+    {
+      "mark": {"type": "text", "dy": -8, "fontSize": 11, "fontWeight": 700},
+      "encoding": {
+        "text": {"field": "rate", "format": ".0%"},
+        "color": {"condition": {"test": "datum.threshold == '3+ a week'", "value": "#123A2C"}, "value": "#3B4757"}
+      }
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Chart 1. Isotype waffle: where Australian adults exercise. Each figure is 1% of adults (15+). AusPlay 2025, Table 7.",
+  "data": {"url": "data/venues_waffle.json"},
+  "transform": [
+    {"calculate": "datum.filled ? datum.venue : 'Not this place'", "as": "fill_group"},
+    {"calculate": "datum.venue + '  ' + datum.pct + '%'", "as": "panel"}
+  ],
+  "facet": {
+    "column": {
+      "field": "panel",
+      "type": "nominal",
+      "sort": {"field": "order"},
+      "header": {
+        "title": null,
+        "labelOrient": "bottom",
+        "labelFontSize": 14,
+        "labelFontWeight": 700,
+        "labelColor": "#1B2A41",
+        "labelPadding": 10
+      }
+    }
+  },
+  "spacing": 30,
+  "spec": {
+    "name": "waffle",
+    "width": 176,
+    "height": 196,
+    "mark": {
+      "type": "point",
+      "filled": true,
+      "size": 330,
+      "shape": "M0,-1 C0.19,-1 0.34,-0.85 0.34,-0.66 C0.34,-0.47 0.19,-0.32 0,-0.32 C-0.19,-0.32 -0.34,-0.47 -0.34,-0.66 C-0.34,-0.85 -0.19,-1 0,-1 Z M-0.5,-0.22 L0.5,-0.22 L0.42,0.3 L0.24,0.3 L0.2,1 L-0.2,1 L-0.24,0.3 L-0.42,0.3 Z"
+    },
+    "encoding": {
+      "x": {"field": "col", "type": "ordinal", "axis": null},
+      "y": {"field": "row", "type": "ordinal", "axis": null, "sort": "descending"},
+      "color": {
+        "field": "fill_group",
+        "type": "nominal",
+        "legend": null,
+        "scale": {
+          "domain": ["Public space", "Gym or leisure centre", "Home", "Free community facility", "Sports club", "Not this place"],
+          "range": ["#F0644A", "#2A9D8F", "#5B4B8A", "#E09F1F", "#3C7DD9", "#E8DCC8"]
+        }
+      },
+      "tooltip": [
+        {"field": "venue", "title": "Place"},
+        {"field": "pct", "title": "% of adults who exercised here"}
+      ]
+    }
+  }
+}

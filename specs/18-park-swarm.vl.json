@@ -1,0 +1,314 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Chart 18. Beeswarm: the 135 capital-city councils placed by local parkland per resident (log scale), in rows by SEIFA 2021 disadvantage (national deciles grouped into fifths), coloured by population density. Dot positions within each row are precomputed in scripts/build_data.py so dots do not overlap; y holds pixel positions.",
+  "width": 820,
+  "height": 460,
+  "layer": [
+    {
+      "data": {
+        "values": [
+          {
+            "y": 92
+          },
+          {
+            "y": 184
+          },
+          {
+            "y": 276
+          },
+          {
+            "y": 368
+          }
+        ]
+      },
+      "mark": {
+        "type": "rule",
+        "color": "#EFE5D3",
+        "strokeWidth": 1.5
+      },
+      "encoding": {
+        "y": {
+          "field": "y",
+          "type": "quantitative",
+          "scale": null
+        },
+        "x": {
+          "datum": 3
+        },
+        "x2": {
+          "datum": 600
+        }
+      }
+    },
+    {
+      "data": {
+        "url": "data/council_swarm.json"
+      },
+      "mark": {
+        "type": "circle",
+        "size": 105,
+        "opacity": 0.92,
+        "stroke": "#FFFDF8",
+        "strokeWidth": 0.9
+      },
+      "encoding": {
+        "x": {
+          "field": "park_m2_pp",
+          "type": "quantitative",
+          "scale": {
+            "type": "log",
+            "domain": [
+              3,
+              600
+            ],
+            "clamp": true
+          },
+          "axis": {
+            "title": "Local parkland per resident (m², log scale)",
+            "values": [
+              5,
+              10,
+              20,
+              50,
+              100,
+              200,
+              500
+            ],
+            "grid": true,
+            "gridColor": "#EFE5D3",
+            "titlePadding": 10
+          }
+        },
+        "y": {
+          "field": "y",
+          "type": "quantitative",
+          "scale": null,
+          "axis": null
+        },
+        "color": {
+          "field": "density_band",
+          "type": "nominal",
+          "title": "Population density",
+          "sort": [
+            "Dense (inner)",
+            "Middle",
+            "Spread out (outer)"
+          ],
+          "scale": {
+            "range": [
+              "#1B2A41",
+              "#5D7896",
+              "#AFC1D4"
+            ]
+          },
+          "legend": {
+            "orient": "top",
+            "direction": "horizontal",
+            "symbolType": "circle"
+          }
+        },
+        "tooltip": [
+          {
+            "field": "council",
+            "title": "Council"
+          },
+          {
+            "field": "city",
+            "title": "City"
+          },
+          {
+            "field": "park_m2_pp",
+            "title": "Local park per resident (m²)",
+            "format": ",.0f"
+          },
+          {
+            "field": "irsd_decile",
+            "title": "SEIFA disadvantage decile (1 = most)"
+          },
+          {
+            "field": "density",
+            "title": "People per km²",
+            "format": ",.0f"
+          }
+        ]
+      }
+    },
+    {
+      "data": {
+        "url": "data/council_swarm.json"
+      },
+      "transform": [
+        {
+          "filter": "indexof(['Prospect', 'Burwood', 'Sydney', 'Mundaring'], datum.council) >= 0"
+        },
+        {
+          "calculate": "(datum.council == 'Sydney' ? 'City of Sydney' : datum.council) + ' ' + format(datum.park_m2_pp, '.0f') + ' m²'",
+          "as": "tag"
+        }
+      ],
+      "mark": {
+        "type": "text",
+        "dy": -11,
+        "fontSize": 10.5,
+        "fontWeight": 700,
+        "color": "#3B4757"
+      },
+      "encoding": {
+        "x": {
+          "field": "park_m2_pp",
+          "type": "quantitative"
+        },
+        "y": {
+          "field": "y",
+          "type": "quantitative",
+          "scale": null
+        },
+        "text": {
+          "field": "tag"
+        }
+      }
+    },
+    {
+      "data": {
+        "url": "data/council_swarm.json"
+      },
+      "transform": [
+        {
+          "aggregate": [
+            {
+              "op": "median",
+              "field": "park_m2_pp",
+              "as": "median"
+            },
+            {
+              "op": "count",
+              "as": "n"
+            }
+          ],
+          "groupby": [
+            "irsd_quintile"
+          ]
+        },
+        {
+          "calculate": "(datum.irsd_quintile - 1) * 92 + 14",
+          "as": "y_top"
+        },
+        {
+          "calculate": "(datum.irsd_quintile - 1) * 92 + 78",
+          "as": "y_bottom"
+        },
+        {
+          "calculate": "'median ' + format(datum.median, '.0f') + ' m²'",
+          "as": "label"
+        }
+      ],
+      "layer": [
+        {
+          "mark": {
+            "type": "rule",
+            "color": "#1B2A41",
+            "strokeWidth": 3,
+            "strokeCap": "round"
+          },
+          "encoding": {
+            "x": {
+              "field": "median",
+              "type": "quantitative"
+            },
+            "y": {
+              "field": "y_top",
+              "type": "quantitative",
+              "scale": null
+            },
+            "y2": {
+              "field": "y_bottom"
+            }
+          }
+        },
+        {
+          "transform": [
+            {
+              "calculate": "(datum.irsd_quintile - 1) * 92 + 46",
+              "as": "y_mid"
+            }
+          ],
+          "mark": {
+            "type": "text",
+            "align": "left",
+            "dx": 14,
+            "baseline": "middle",
+            "fontSize": 11.5,
+            "fontWeight": 800,
+            "color": "#1B2A41"
+          },
+          "encoding": {
+            "x": {
+              "datum": 600
+            },
+            "y": {
+              "field": "y_mid",
+              "type": "quantitative",
+              "scale": null
+            },
+            "text": {
+              "field": "label"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "data": {
+        "values": [
+          {
+            "q": 1,
+            "label": "Most disadvantaged fifth (9 councils)"
+          },
+          {
+            "q": 2,
+            "label": "Second fifth (10)"
+          },
+          {
+            "q": 3,
+            "label": "Middle fifth (13)"
+          },
+          {
+            "q": 4,
+            "label": "Fourth fifth (28)"
+          },
+          {
+            "q": 5,
+            "label": "Least disadvantaged fifth (75)"
+          }
+        ]
+      },
+      "transform": [
+        {
+          "calculate": "(datum.q - 1) * 92 + 4",
+          "as": "y"
+        }
+      ],
+      "mark": {
+        "type": "text",
+        "align": "left",
+        "baseline": "top",
+        "fontSize": 11.5,
+        "fontWeight": 800,
+        "color": "#1B2A41"
+      },
+      "encoding": {
+        "x": {
+          "datum": 3.1
+        },
+        "y": {
+          "field": "y",
+          "type": "quantitative",
+          "scale": null
+        },
+        "text": {
+          "field": "label"
+        }
+      }
+    }
+  ]
+}

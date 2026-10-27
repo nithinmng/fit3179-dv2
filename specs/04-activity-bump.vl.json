@@ -1,0 +1,247 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Chart 4. Bump chart: rank of the eight most popular activities within each adult age group. AusPlay 2025, Table 17.",
+  "width": 720,
+  "height": 330,
+  "data": {
+    "url": "data/activity_age.json"
+  },
+  "transform": [
+    {
+      "window": [
+        {
+          "op": "dense_rank",
+          "as": "overall"
+        }
+      ],
+      "sort": [
+        {
+          "field": "total",
+          "order": "descending"
+        }
+      ]
+    },
+    {
+      "filter": "datum.overall <= 8"
+    },
+    {
+      "window": [
+        {
+          "op": "rank",
+          "as": "rank"
+        }
+      ],
+      "groupby": [
+        "age"
+      ],
+      "sort": [
+        {
+          "field": "rate",
+          "order": "descending"
+        }
+      ]
+    }
+  ],
+  "encoding": {
+    "x": {
+      "field": "age",
+      "type": "ordinal",
+      "sort": [
+        "15–17",
+        "18–24",
+        "25–34",
+        "35–44",
+        "45–54",
+        "55–64",
+        "65+"
+      ],
+      "scale": {
+        "padding": 0.4
+      },
+      "axis": {
+        "title": null,
+        "orient": "top",
+        "labelAngle": 0,
+        "domain": false,
+        "ticks": false,
+        "labelFontSize": 13,
+        "labelFontWeight": 700,
+        "labelPadding": 12,
+        "grid": true,
+        "gridColor": "#F1E8D8"
+      }
+    },
+    "y": {
+      "field": "rank",
+      "type": "ordinal",
+      "axis": null
+    },
+    "color": {
+      "field": "activity",
+      "type": "nominal",
+      "legend": null,
+      "scale": {
+        "domain": [
+          "Walking",
+          "Gym and fitness",
+          "Running",
+          "Bushwalking",
+          "Swimming",
+          "Cycling",
+          "Pilates",
+          "Football (soccer)"
+        ],
+        "range": [
+          "#F0644A",
+          "#2A9D8F",
+          "#E09F1F",
+          "#1F5C45",
+          "#3C7DD9",
+          "#8C7FB8",
+          "#C9729E",
+          "#8DA35C"
+        ]
+      }
+    },
+    "opacity": {
+      "condition": {
+        "param": "hover",
+        "empty": true,
+        "value": 1
+      },
+      "value": 0.14
+    }
+  },
+  "layer": [
+    {
+      "params": [
+        {
+          "name": "hover",
+          "select": {
+            "type": "point",
+            "fields": [
+              "activity"
+            ],
+            "on": "pointerover",
+            "clear": "pointerout"
+          }
+        }
+      ],
+      "mark": {
+        "type": "line",
+        "strokeWidth": 6,
+        "interpolate": "monotone",
+        "strokeCap": "round"
+      }
+    },
+    {
+      "mark": {
+        "type": "circle",
+        "size": 260,
+        "stroke": "#FFFDF8",
+        "strokeWidth": 2.5,
+        "opacity": 1
+      },
+      "encoding": {
+        "tooltip": [
+          {
+            "field": "activity",
+            "title": "Activity"
+          },
+          {
+            "field": "age",
+            "title": "Age group"
+          },
+          {
+            "field": "rank",
+            "title": "Rank in age group"
+          },
+          {
+            "field": "rate",
+            "title": "Share who did it",
+            "format": ".0%"
+          }
+        ]
+      }
+    },
+    {
+      "transform": [
+        {
+          "filter": "datum.age == '15–17'"
+        }
+      ],
+      "mark": {
+        "type": "text",
+        "align": "right",
+        "dx": -18,
+        "fontSize": 13,
+        "fontWeight": 700,
+        "color": "#1B2A41"
+      },
+      "encoding": {
+        "text": {
+          "field": "activity"
+        }
+      }
+    },
+    {
+      "transform": [
+        {
+          "filter": "datum.age == '65+'"
+        }
+      ],
+      "mark": {
+        "type": "text",
+        "align": "left",
+        "dx": 18,
+        "fontSize": 13,
+        "fontWeight": 700,
+        "color": "#1B2A41"
+      },
+      "encoding": {
+        "text": {
+          "field": "activity"
+        }
+      }
+    },
+    {
+      "data": {
+        "values": [
+          {
+            "t": "The swap: walking overtakes the gym"
+          }
+        ]
+      },
+      "mark": {
+        "type": "text",
+        "dy": -14,
+        "dx": 0,
+        "fontSize": 11.5,
+        "fontWeight": 800,
+        "color": "#B8321C",
+        "align": "center"
+      },
+      "encoding": {
+        "x": {
+          "datum": "35–44",
+          "type": "ordinal"
+        },
+        "y": {
+          "datum": 1
+        },
+        "text": {
+          "field": "t"
+        },
+        "color": {
+          "value": "#B8321C"
+        },
+        "opacity": {
+          "value": 1
+        },
+        "xOffset": {
+          "value": -60
+        }
+      }
+    }
+  ]
+}

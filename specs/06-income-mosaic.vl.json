@@ -1,0 +1,56 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Chart 6. Mosaic (Marimekko): household income band (column width = share of adults) by how often adults were active. AusPlay 2025, Table 1, adults 18+ who stated income.",
+  "width": 400,
+  "height": 300,
+  "data": {"url": "data/income_mosaic.json"},
+  "transform": [
+    {"calculate": "(datum.x0 + datum.x1) / 2", "as": "xm"},
+    {"calculate": "format(datum.weekly, '.0%') + ' weekly'", "as": "weekly_label"},
+    {"calculate": "{'<$40,000': 'Under $40k', '$40,000 - $69,999': '$40–70k', '$70,000 - $99,999': '$70–100k', '$100,000 - $149,999': '$100–150k', '$150,000 - $199,999': '$150–200k', '$200,000+': '$200k+'}[datum.band]", "as": "band_short"}
+  ],
+  "layer": [
+    {
+      "name": "mosaic",
+      "mark": {"type": "rect", "stroke": "#FFFDF8", "strokeWidth": 2},
+      "encoding": {
+        "x": {"field": "x0", "type": "quantitative", "scale": {"domain": [0, 1]}, "axis": null},
+        "x2": {"field": "x1"},
+        "y": {"field": "y0", "type": "quantitative", "scale": {"domain": [0, 1]}, "axis": {"format": ".0%", "title": null, "values": [0, 0.25, 0.5, 0.75, 1], "grid": false}},
+        "y2": {"field": "y1"},
+        "color": {
+          "field": "cls",
+          "type": "ordinal",
+          "title": null,
+          "sort": ["3+ times a week", "1–2 times a week", "Less than weekly", "Not active in the past year"],
+          "scale": {"range": ["#1F5C45", "#5FAE85", "#BFE0C8", "#A3968A"]},
+          "legend": {"orient": "bottom", "columns": 2, "symbolType": "square", "labelLimit": 200}
+        },
+        "tooltip": [
+          {"field": "band", "title": "Household income"},
+          {"field": "cls", "title": "How often active"},
+          {"field": "share", "title": "Share of the band", "format": ".1%"},
+          {"field": "width", "title": "Band's share of adults", "format": ".1%"}
+        ]
+      }
+    },
+    {
+      "transform": [{"filter": "datum.order == 1"}],
+      "mark": {"type": "text", "baseline": "top", "dy": 5, "fontSize": 11.5, "fontWeight": 800, "color": "#FFFDF8"},
+      "encoding": {
+        "x": {"field": "xm", "type": "quantitative"},
+        "y": {"field": "y1", "type": "quantitative"},
+        "text": {"field": "weekly_label"}
+      }
+    },
+    {
+      "transform": [{"filter": "datum.order == 3"}],
+      "mark": {"type": "text", "baseline": "bottom", "dy": -6, "fontSize": 11, "fontWeight": 700, "color": "#1B2A41"},
+      "encoding": {
+        "x": {"field": "xm", "type": "quantitative"},
+        "y": {"datum": 1},
+        "text": {"field": "band_short"}
+      }
+    }
+  ]
+}

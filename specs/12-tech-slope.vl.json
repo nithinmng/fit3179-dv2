@@ -1,0 +1,296 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Chart 12. Slope chart: share of active adults using each technology, 18 to 24 year olds vs over-65s. AusPlay 2025, Table 11.",
+  "width": 236,
+  "height": 380,
+  "data": {
+    "url": "data/technology.json"
+  },
+  "transform": [
+    {
+      "calculate": "indexof(['Music apps', 'Headphones or speakers'], datum.tech) >= 0 ? 'falls' : indexof(['Wearables (watches, trackers)', 'Activity-tracking apps'], datum.tech) >= 0 ? 'holds' : 'other'",
+      "as": "group"
+    }
+  ],
+  "encoding": {
+    "x": {
+      "field": "age",
+      "type": "ordinal",
+      "sort": [
+        "18–24",
+        "65+"
+      ],
+      "scale": {
+        "type": "point",
+        "padding": 0.22
+      },
+      "axis": {
+        "title": null,
+        "orient": "top",
+        "labelAngle": 0,
+        "domain": false,
+        "ticks": false,
+        "labelFontSize": 13,
+        "labelFontWeight": 800,
+        "labelExpr": "datum.label == '65+' ? 'Over 65' : 'Age 18–24'"
+      }
+    },
+    "y": {
+      "field": "rate",
+      "type": "quantitative",
+      "scale": {
+        "domain": [
+          0,
+          0.7
+        ]
+      },
+      "axis": {
+        "orient": "right",
+        "format": ".0%",
+        "values": [
+          0,
+          0.2,
+          0.4,
+          0.6
+        ],
+        "title": "Share of active adults",
+        "titleAngle": 90,
+        "grid": true,
+        "gridColor": "#EFE5D3",
+        "domain": false,
+        "ticks": false,
+        "labelPadding": 6
+      }
+    },
+    "color": {
+      "field": "group",
+      "type": "nominal",
+      "legend": null,
+      "scale": {
+        "domain": [
+          "falls",
+          "holds",
+          "other"
+        ],
+        "range": [
+          "#C27C0E",
+          "#1F5C45",
+          "#CFC4B2"
+        ]
+      }
+    }
+  },
+  "layer": [
+    {
+      "mark": {
+        "type": "rule",
+        "color": "#D9C9AE",
+        "strokeWidth": 1.5
+      },
+      "encoding": {
+        "y": {
+          "datum": 0
+        },
+        "y2": {
+          "datum": 0.7
+        },
+        "color": {
+          "value": "#D9C9AE"
+        },
+        "detail": {
+          "field": "age"
+        }
+      }
+    },
+    {
+      "mark": {
+        "type": "line",
+        "strokeWidth": 3.5,
+        "strokeCap": "round"
+      },
+      "encoding": {
+        "detail": {
+          "field": "tech"
+        },
+        "strokeWidth": {
+          "condition": {
+            "test": "datum.group != 'other'",
+            "value": 4.5
+          },
+          "value": 2
+        }
+      }
+    },
+    {
+      "mark": {
+        "type": "circle",
+        "size": 110,
+        "opacity": 1,
+        "stroke": "#FFFDF8",
+        "strokeWidth": 1.5
+      },
+      "encoding": {
+        "tooltip": [
+          {
+            "field": "tech",
+            "title": "Technology"
+          },
+          {
+            "field": "age",
+            "title": "Age group"
+          },
+          {
+            "field": "rate",
+            "title": "Share of active adults",
+            "format": ".1%"
+          }
+        ]
+      }
+    },
+    {
+      "transform": [
+        {
+          "filter": "datum.age == '18–24' && datum.group != 'other'"
+        }
+      ],
+      "mark": {
+        "type": "text",
+        "align": "right",
+        "dx": -10,
+        "fontSize": 11.5,
+        "fontWeight": 800
+      },
+      "encoding": {
+        "text": {
+          "field": "tech"
+        },
+        "color": {
+          "field": "group",
+          "type": "nominal",
+          "scale": {
+            "domain": [
+              "falls",
+              "holds",
+              "other"
+            ],
+            "range": [
+              "#8A5A00",
+              "#1F5C45",
+              "#6B6355"
+            ]
+          },
+          "legend": null
+        }
+      }
+    },
+    {
+      "transform": [
+        {
+          "filter": "datum.age == '18–24' && datum.group == 'other'"
+        },
+        {
+          "calculate": "datum.rate + (datum.tech == 'Smart trainers or treadmills' ? 0.007 : datum.tech == 'Apps used during the activity' ? -0.007 : 0)",
+          "as": "label_y"
+        }
+      ],
+      "mark": {
+        "type": "text",
+        "align": "right",
+        "dx": -10,
+        "fontSize": 11.5,
+        "fontWeight": 500
+      },
+      "encoding": {
+        "text": {
+          "field": "tech"
+        },
+        "color": {
+          "value": "#6B6355"
+        },
+        "y": {
+          "field": "label_y",
+          "type": "quantitative"
+        }
+      }
+    },
+    {
+      "transform": [
+        {
+          "filter": "datum.age == '65+' && datum.group != 'other' && datum.tech != 'Headphones or speakers'"
+        }
+      ],
+      "mark": {
+        "type": "text",
+        "align": "left",
+        "dx": 9,
+        "fontSize": 11.5,
+        "fontWeight": 800
+      },
+      "encoding": {
+        "text": {
+          "field": "rate",
+          "format": ".0%"
+        },
+        "color": {
+          "field": "group",
+          "type": "nominal",
+          "scale": {
+            "domain": [
+              "falls",
+              "holds",
+              "other"
+            ],
+            "range": [
+              "#8A5A00",
+              "#1F5C45",
+              "#6B6355"
+            ]
+          },
+          "legend": null
+        }
+      }
+    },
+    {
+      "transform": [
+        {
+          "filter": "datum.age == '18–24' && datum.group != 'other'"
+        }
+      ],
+      "mark": {
+        "type": "text",
+        "align": "left",
+        "dx": 9,
+        "fontSize": 11.5,
+        "fontWeight": 800
+      },
+      "encoding": {
+        "text": {
+          "field": "rate",
+          "format": ".0%"
+        },
+        "color": {
+          "field": "group",
+          "type": "nominal",
+          "scale": {
+            "domain": [
+              "falls",
+              "holds",
+              "other"
+            ],
+            "range": [
+              "#8A5A00",
+              "#1F5C45",
+              "#6B6355"
+            ]
+          },
+          "legend": null
+        }
+      }
+    }
+  ],
+  "resolve": {
+    "scale": {
+      "color": "independent"
+    }
+  }
+}

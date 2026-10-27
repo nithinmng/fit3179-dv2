@@ -1,0 +1,70 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Chart 5. Population pyramid (butterfly): share of each age group who exercised in public space, women vs men. AusPlay 2025, Table 7.",
+  "data": {"url": "data/public_space_age_sex.json"},
+  "spacing": 0,
+  "hconcat": [
+    {
+      "width": 190,
+      "height": 290,
+      "transform": [{"filter": "datum.sex == 'Women'"}],
+      "title": {"text": "Women", "anchor": "end", "color": "#9B3D69", "fontSize": 14},
+      "encoding": {
+        "y": {"field": "age", "type": "ordinal", "sort": ["65+", "55–64", "45–54", "35–44", "25–34", "18–24", "15–17"], "axis": null},
+        "x": {
+          "field": "rate",
+          "type": "quantitative",
+          "scale": {"domain": [0, 0.8], "reverse": true},
+          "axis": {"format": ".0%", "title": null, "values": [0, 0.25, 0.5, 0.75], "grid": true}
+        }
+      },
+      "layer": [
+        {
+          "name": "women_bars",
+          "mark": {"type": "bar", "color": "#B5487A", "cornerRadiusTopLeft": 5, "cornerRadiusBottomLeft": 5, "height": {"band": 0.72}},
+          "encoding": {"tooltip": [{"field": "age", "title": "Age"}, {"field": "rate", "title": "Women in public space", "format": ".1%"}]}
+        },
+        {
+          "mark": {"type": "text", "align": "right", "dx": -5, "fontSize": 11.5, "fontWeight": 700, "color": "#9B3D69"},
+          "encoding": {"text": {"field": "rate", "format": ".0%"}}
+        }
+      ]
+    },
+    {
+      "width": 62,
+      "height": 290,
+      "transform": [{"filter": "datum.sex == 'Men'"}],
+      "mark": {"type": "text", "fontSize": 12.5, "fontWeight": 800, "color": "#1B2A41"},
+      "encoding": {
+        "y": {"field": "age", "type": "ordinal", "sort": ["65+", "55–64", "45–54", "35–44", "25–34", "18–24", "15–17"], "axis": null},
+        "text": {"field": "age"}
+      }
+    },
+    {
+      "width": 190,
+      "height": 290,
+      "transform": [{"filter": "datum.sex == 'Men'"}],
+      "title": {"text": "Men", "anchor": "start", "color": "#2F4A6D", "fontSize": 14},
+      "encoding": {
+        "y": {"field": "age", "type": "ordinal", "sort": ["65+", "55–64", "45–54", "35–44", "25–34", "18–24", "15–17"], "axis": null},
+        "x": {
+          "field": "rate",
+          "type": "quantitative",
+          "scale": {"domain": [0, 0.8]},
+          "axis": {"format": ".0%", "title": null, "values": [0, 0.25, 0.5, 0.75], "grid": true}
+        }
+      },
+      "layer": [
+        {
+          "name": "men_bars",
+          "mark": {"type": "bar", "color": "#3D5A80", "cornerRadiusTopRight": 5, "cornerRadiusBottomRight": 5, "height": {"band": 0.72}},
+          "encoding": {"tooltip": [{"field": "age", "title": "Age"}, {"field": "rate", "title": "Men in public space", "format": ".1%"}]}
+        },
+        {
+          "mark": {"type": "text", "align": "left", "dx": 5, "fontSize": 11.5, "fontWeight": 700, "color": "#2F4A6D"},
+          "encoding": {"text": {"field": "rate", "format": ".0%"}}
+        }
+      ]
+    }
+  ]
+}

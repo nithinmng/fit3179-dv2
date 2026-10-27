@@ -1,0 +1,388 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Charts 2 and 3. Left: spike map (proportional symbols) of adults who exercised in public space, by state. Right: connected dot plot of public space vs gym or fitness centre, by state. Click a spike or a row to highlight a state in both. AusPlay 2025, state Table 7.",
+  "params": [
+    {
+      "name": "pick",
+      "select": {
+        "type": "point",
+        "fields": [
+          "state"
+        ],
+        "on": "click",
+        "clear": "dblclick"
+      },
+      "views": [
+        "spikes",
+        "dumbbell_dots"
+      ],
+      "bind": {
+        "input": "select",
+        "name": "Highlight a state ",
+        "options": [
+          null,
+          "NSW",
+          "VIC",
+          "QLD",
+          "WA",
+          "SA",
+          "TAS",
+          "ACT",
+          "NT"
+        ],
+        "labels": [
+          "All states",
+          "New South Wales",
+          "Victoria",
+          "Queensland",
+          "Western Australia",
+          "South Australia",
+          "Tasmania",
+          "Australian Capital Territory",
+          "Northern Territory"
+        ]
+      }
+    }
+  ],
+  "spacing": 40,
+  "hconcat": [
+    {
+      "width": 430,
+      "height": 400,
+      "title": {
+        "text": "Adults who exercised in public space",
+        "subtitle": "Spike height = estimated number of adults, 2025",
+        "anchor": "start"
+      },
+      "projection": {
+        "type": "conicEqualArea",
+        "parallels": [
+          -18,
+          -36
+        ],
+        "rotate": [
+          -132,
+          0
+        ]
+      },
+      "layer": [
+        {
+          "data": {
+            "url": "data/states.json",
+            "format": {
+              "type": "json",
+              "property": "features"
+            }
+          },
+          "mark": {
+            "type": "geoshape",
+            "fill": "#E7E2D8",
+            "stroke": "#FFFDF8",
+            "strokeWidth": 1.5
+          }
+        },
+        {
+          "name": "spikes",
+          "data": {
+            "url": "data/states_venues.json"
+          },
+          "transform": [
+            {
+              "joinaggregate": [
+                {
+                  "op": "max",
+                  "field": "public_people",
+                  "as": "max_people"
+                }
+              ]
+            },
+            {
+              "calculate": "'M-0.7,0 L0,-' + format(11 * datum.public_people / datum.max_people, '.3f') + ' L0.7,0 Z'",
+              "as": "spike"
+            }
+          ],
+          "mark": {
+            "type": "point",
+            "filled": true,
+            "size": 600,
+            "stroke": "#FFFDF8",
+            "strokeWidth": 0.8,
+            "cursor": "pointer"
+          },
+          "encoding": {
+            "longitude": {
+              "field": "lon",
+              "type": "quantitative"
+            },
+            "latitude": {
+              "field": "lat",
+              "type": "quantitative"
+            },
+            "shape": {
+              "field": "spike",
+              "type": "nominal",
+              "scale": null
+            },
+            "color": {
+              "field": "public",
+              "type": "quantitative",
+              "title": "Share of adults",
+              "scale": {
+                "domain": [
+                  0.6,
+                  0.74
+                ],
+                "range": [
+                  "#F59A7F",
+                  "#8E1F0E"
+                ]
+              },
+              "legend": {
+                "format": ".0%",
+                "orient": "bottom-left",
+                "direction": "horizontal",
+                "gradientLength": 140
+              }
+            },
+            "opacity": {
+              "condition": {
+                "param": "pick",
+                "empty": true,
+                "value": 1
+              },
+              "value": 0.22
+            },
+            "tooltip": [
+              {
+                "field": "name",
+                "title": "State or territory"
+              },
+              {
+                "field": "public_people",
+                "title": "Adults who exercised in public space",
+                "format": ",.0f"
+              },
+              {
+                "field": "public",
+                "title": "Share of adults",
+                "format": ".1%"
+              }
+            ]
+          }
+        },
+        {
+          "data": {
+            "url": "data/states_venues.json"
+          },
+          "transform": [
+            {
+              "calculate": "datum.state + '  ' + format(datum.public_people / 1e6, '.1f') + 'M'",
+              "as": "label"
+            }
+          ],
+          "mark": {
+            "type": "text",
+            "dy": 11,
+            "fontSize": 11.5,
+            "fontWeight": 700,
+            "color": "#1B2A41"
+          },
+          "encoding": {
+            "longitude": {
+              "field": "lon",
+              "type": "quantitative"
+            },
+            "latitude": {
+              "field": "lat",
+              "type": "quantitative"
+            },
+            "text": {
+              "field": "label"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "width": 330,
+      "height": 330,
+      "title": {
+        "text": "Public space vs the gym",
+        "subtitle": "Share of adults (15+) who exercised in each place, 2025",
+        "anchor": "start"
+      },
+      "data": {
+        "url": "data/states_venues.json"
+      },
+      "transform": [
+        {
+          "calculate": "datum.public - datum.gym",
+          "as": "gap"
+        },
+        {
+          "calculate": "'+' + round(datum.gap * 100) + ' pts'",
+          "as": "gap_label"
+        }
+      ],
+      "encoding": {
+        "y": {
+          "field": "name",
+          "type": "nominal",
+          "sort": {
+            "field": "gap",
+            "order": "descending"
+          },
+          "title": null,
+          "axis": {
+            "domain": false,
+            "ticks": false,
+            "labelPadding": 8,
+            "labelFontSize": 12
+          }
+        }
+      },
+      "layer": [
+        {
+          "mark": {
+            "type": "rule",
+            "strokeWidth": 4,
+            "color": "#E3D5BE",
+            "strokeCap": "round"
+          },
+          "encoding": {
+            "x": {
+              "field": "gym",
+              "type": "quantitative",
+              "scale": {
+                "domain": [
+                  0,
+                  0.92
+                ]
+              },
+              "axis": {
+                "format": ".0%",
+                "title": null,
+                "values": [
+                  0,
+                  0.2,
+                  0.4,
+                  0.6,
+                  0.8
+                ]
+              }
+            },
+            "x2": {
+              "field": "public"
+            },
+            "opacity": {
+              "condition": {
+                "param": "pick",
+                "empty": true,
+                "value": 1
+              },
+              "value": 0.25
+            }
+          }
+        },
+        {
+          "name": "dumbbell_dots",
+          "transform": [
+            {
+              "fold": [
+                "gym",
+                "public"
+              ],
+              "as": [
+                "place",
+                "rate"
+              ]
+            }
+          ],
+          "mark": {
+            "type": "circle",
+            "size": 170,
+            "opacity": 1,
+            "stroke": "#FFFDF8",
+            "strokeWidth": 1.5,
+            "cursor": "pointer"
+          },
+          "encoding": {
+            "x": {
+              "field": "rate",
+              "type": "quantitative"
+            },
+            "color": {
+              "field": "place",
+              "type": "nominal",
+              "scale": {
+                "domain": [
+                  "public",
+                  "gym"
+                ],
+                "range": [
+                  "#F0644A",
+                  "#2A9D8F"
+                ]
+              },
+              "legend": {
+                "title": null,
+                "orient": "top",
+                "labelExpr": "datum.label == 'public' ? 'Public space' : 'Gym or leisure centre'"
+              }
+            },
+            "opacity": {
+              "condition": {
+                "param": "pick",
+                "empty": true,
+                "value": 1
+              },
+              "value": 0.22
+            },
+            "tooltip": [
+              {
+                "field": "name",
+                "title": "State or territory"
+              },
+              {
+                "field": "place",
+                "title": "Place"
+              },
+              {
+                "field": "rate",
+                "title": "Share of adults",
+                "format": ".1%"
+              }
+            ]
+          }
+        },
+        {
+          "mark": {
+            "type": "text",
+            "align": "left",
+            "dx": 12,
+            "fontSize": 11.5,
+            "fontWeight": 700,
+            "color": "#B8321C"
+          },
+          "encoding": {
+            "x": {
+              "field": "public",
+              "type": "quantitative"
+            },
+            "text": {
+              "field": "gap_label"
+            },
+            "opacity": {
+              "condition": {
+                "param": "pick",
+                "empty": true,
+                "value": 1
+              },
+              "value": 0.25
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

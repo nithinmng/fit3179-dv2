@@ -1,0 +1,621 @@
+{
+  "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "description": "Chart 17. Dorling cartogram: every council as a circle near its real location, circle area proportional to population (ABS, 30 June 2025), coloured by local parkland per resident (ABS 2021 mesh block land use, parkland blocks of 50 ha or less). Circle positions are computed in scripts/build_data.py: centroids projected with the same equal-area conic projection as the other maps (parallels 18°S and 36°S, centred on 132°E), then pushed apart so circles do not overlap. Two sliders set the smallest and largest council shown; councils outside the range fade to an outline. Idea adapted from the Vega example gallery 'Dorling Cartogram'.",
+  "width": 860,
+  "height": 600,
+  "autosize": "none",
+  "padding": 5,
+  "data": [
+    {
+      "name": "states",
+      "url": "data/dorling.json",
+      "format": {
+        "type": "json",
+        "property": "states"
+      }
+    },
+    {
+      "name": "circles",
+      "url": "data/dorling.json",
+      "format": {
+        "type": "json",
+        "property": "circles"
+      },
+      "transform": [
+        {
+          "type": "formula",
+          "as": "cls",
+          "expr": "datum.zero ? 'No parkland block of 50 ha or less' : datum.park < 20 ? 'Under 20 m²' : datum.park < 40 ? '20 to 40' : datum.park < 70 ? '40 to 70' : datum.park < 120 ? '70 to 120' : '120 or more'"
+        },
+        {
+          "type": "collect",
+          "sort": {
+            "field": "r",
+            "order": "descending"
+          }
+        }
+      ]
+    },
+    {
+      "name": "summary",
+      "source": "circles",
+      "transform": [
+        {
+          "type": "formula",
+          "as": "shown",
+          "expr": "(datum.pop >= lo_pop && datum.pop <= hi_pop) ? 1 : 0"
+        },
+        {
+          "type": "formula",
+          "as": "shown_pop",
+          "expr": "datum.shown * datum.pop"
+        },
+        {
+          "type": "aggregate",
+          "fields": [
+            "shown",
+            "shown_pop",
+            "pop"
+          ],
+          "ops": [
+            "sum",
+            "sum",
+            "sum"
+          ],
+          "as": [
+            "n_shown",
+            "pop_shown",
+            "pop_all"
+          ]
+        },
+        {
+          "type": "formula",
+          "as": "line1",
+          "expr": "lo_i > hi_i ? 'Drag the sliders apart to show councils' : lo_i == 0 && hi_i == 9 ? 'All councils shown' : lo_i == 0 ? 'Councils under ' + format(hi_pop, ',') + ' people' : hi_i == 9 ? 'Councils of ' + format(lo_pop, ',') + ' people or more' : 'Councils of ' + format(lo_pop, ',') + ' to ' + format(hi_pop, ',') + ' people'"
+        },
+        {
+          "type": "formula",
+          "as": "line2",
+          "expr": "datum.n_shown + ' of 548 councils, home to ' + format(datum.pop_shown / datum.pop_all, '.0%') + ' of Australians'"
+        }
+      ]
+    },
+    {
+      "name": "labels",
+      "url": "data/dorling.json",
+      "format": {
+        "type": "json",
+        "property": "labels"
+      },
+      "transform": [
+        {
+          "type": "lookup",
+          "from": "circles",
+          "key": "council",
+          "fields": [
+            "text"
+          ],
+          "values": [
+            "pop"
+          ],
+          "as": [
+            "pop"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "cities",
+      "url": "data/dorling.json",
+      "format": {
+        "type": "json",
+        "property": "cities"
+      }
+    },
+    {
+      "name": "size_legend",
+      "url": "data/dorling.json",
+      "format": {
+        "type": "json",
+        "property": "size_legend"
+      },
+      "transform": [
+        {
+          "type": "window",
+          "ops": [
+            "row_number"
+          ],
+          "as": [
+            "i"
+          ]
+        },
+        {
+          "type": "formula",
+          "as": "cx",
+          "expr": "628 + datum.i * 62"
+        },
+        {
+          "type": "formula",
+          "as": "cy",
+          "expr": "586 - datum.r"
+        }
+      ]
+    }
+  ],
+  "scales": [
+    {
+      "name": "color",
+      "type": "ordinal",
+      "domain": [
+        "No parkland block of 50 ha or less",
+        "Under 20 m²",
+        "20 to 40",
+        "40 to 70",
+        "70 to 120",
+        "120 or more"
+      ],
+      "range": [
+        "#CFC8BD",
+        "#EBC77E",
+        "#CFE3B2",
+        "#8DC594",
+        "#3F8C64",
+        "#1F5C45"
+      ]
+    }
+  ],
+  "legends": [
+    {
+      "fill": "color",
+      "title": "Local park per resident (m²)",
+      "orient": "none",
+      "legendX": 0,
+      "legendY": 524,
+      "direction": "horizontal",
+      "columns": 3,
+      "symbolType": "circle",
+      "symbolSize": 140,
+      "columnPadding": 12,
+      "rowPadding": 6,
+      "labelLimit": 220,
+      "encode": {
+        "symbols": {
+          "update": {
+            "stroke": {
+              "value": "#8A8173"
+            },
+            "strokeWidth": {
+              "value": 0.5
+            }
+          }
+        }
+      }
+    }
+  ],
+  "marks": [
+    {
+      "type": "path",
+      "from": {
+        "data": "states"
+      },
+      "aria": false,
+      "interactive": false,
+      "encode": {
+        "enter": {
+          "path": {
+            "field": "path"
+          },
+          "fill": {
+            "value": "#ECE7DD"
+          },
+          "stroke": {
+            "value": "#FFFDF8"
+          },
+          "strokeWidth": {
+            "value": 1.2
+          }
+        }
+      }
+    },
+    {
+      "name": "bubbles",
+      "type": "symbol",
+      "from": {
+        "data": "circles"
+      },
+      "aria": false,
+      "encode": {
+        "enter": {
+          "x": {
+            "field": "x"
+          },
+          "y": {
+            "field": "y"
+          },
+          "shape": {
+            "value": "circle"
+          },
+          "size": {
+            "signal": "4 * datum.r * datum.r"
+          },
+          "fill": {
+            "scale": "color",
+            "field": "cls"
+          },
+          "stroke": {
+            "value": "#6B6355"
+          }
+        },
+        "update": {
+          "strokeWidth": {
+            "value": 0.5
+          },
+          "stroke": {
+            "value": "#6B6355"
+          },
+          "fillOpacity": {
+            "signal": "(datum.pop >= lo_pop && datum.pop <= hi_pop) ? 1 : 0.07"
+          },
+          "strokeOpacity": {
+            "signal": "(datum.pop >= lo_pop && datum.pop <= hi_pop) ? 0.55 : 0.22"
+          },
+          "tooltip": {
+            "signal": "(datum.pop >= lo_pop && datum.pop <= hi_pop) ? {'Council': datum.council, 'State': datum.state, 'People (2025)': format(datum.pop, ','), 'Local park per resident': datum.zero ? 'none (no parkland block of 50 ha or less)' : format(datum.park, ',.0f') + ' m²', 'All parkland per resident': format(datum.park_all, ',') + ' m²'} : null"
+          }
+        },
+        "hover": {
+          "strokeWidth": {
+            "signal": "(datum.pop >= lo_pop && datum.pop <= hi_pop) ? 2.5 : 0.5"
+          },
+          "stroke": {
+            "signal": "(datum.pop >= lo_pop && datum.pop <= hi_pop) ? '#1B2A41' : '#6B6355'"
+          },
+          "strokeOpacity": {
+            "signal": "(datum.pop >= lo_pop && datum.pop <= hi_pop) ? 1 : 0.22"
+          }
+        }
+      }
+    },
+    {
+      "type": "text",
+      "from": {
+        "data": "labels"
+      },
+      "aria": false,
+      "interactive": false,
+      "encode": {
+        "enter": {
+          "x": {
+            "field": "x"
+          },
+          "y": {
+            "field": "y"
+          },
+          "text": {
+            "field": "text"
+          },
+          "align": {
+            "value": "center"
+          },
+          "baseline": {
+            "value": "middle"
+          },
+          "font": {
+            "value": "'DM Sans', system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
+          },
+          "fontSize": {
+            "value": 10.5
+          },
+          "fontWeight": {
+            "value": 800
+          },
+          "fill": {
+            "signal": "datum.dark ? '#FFFDF8' : '#1B2A41'"
+          }
+        },
+        "update": {
+          "opacity": {
+            "signal": "datum.pop >= lo_pop && datum.pop <= hi_pop ? 1 : 0"
+          }
+        }
+      }
+    },
+    {
+      "type": "text",
+      "from": {
+        "data": "cities"
+      },
+      "aria": false,
+      "interactive": false,
+      "encode": {
+        "enter": {
+          "x": {
+            "field": "x"
+          },
+          "y": {
+            "field": "y"
+          },
+          "text": {
+            "field": "text"
+          },
+          "align": {
+            "value": "center"
+          },
+          "baseline": {
+            "value": "middle"
+          },
+          "font": {
+            "value": "'DM Sans', system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
+          },
+          "fontSize": {
+            "value": 11.5
+          },
+          "fontWeight": {
+            "value": 900
+          },
+          "fill": {
+            "value": "#1B2A41"
+          },
+          "stroke": {
+            "value": "#FFFDF8"
+          },
+          "strokeWidth": {
+            "value": 4
+          },
+          "strokeOpacity": {
+            "value": 0.9
+          }
+        }
+      }
+    },
+    {
+      "type": "text",
+      "from": {
+        "data": "cities"
+      },
+      "aria": false,
+      "interactive": false,
+      "encode": {
+        "enter": {
+          "x": {
+            "field": "x"
+          },
+          "y": {
+            "field": "y"
+          },
+          "text": {
+            "field": "text"
+          },
+          "align": {
+            "value": "center"
+          },
+          "baseline": {
+            "value": "middle"
+          },
+          "font": {
+            "value": "'DM Sans', system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
+          },
+          "fontSize": {
+            "value": 11.5
+          },
+          "fontWeight": {
+            "value": 900
+          },
+          "fill": {
+            "value": "#1B2A41"
+          }
+        }
+      }
+    },
+    {
+      "type": "text",
+      "aria": false,
+      "interactive": false,
+      "encode": {
+        "enter": {
+          "x": {
+            "value": 660
+          },
+          "y": {
+            "value": 518
+          },
+          "text": {
+            "value": "Circle area = people (2025)"
+          },
+          "font": {
+            "value": "'DM Sans', system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
+          },
+          "fontSize": {
+            "value": 12
+          },
+          "fontWeight": {
+            "value": 700
+          },
+          "fill": {
+            "value": "#1B2A41"
+          }
+        }
+      }
+    },
+    {
+      "type": "symbol",
+      "from": {
+        "data": "size_legend"
+      },
+      "aria": false,
+      "interactive": false,
+      "encode": {
+        "enter": {
+          "x": {
+            "field": "cx"
+          },
+          "y": {
+            "field": "cy"
+          },
+          "shape": {
+            "value": "circle"
+          },
+          "size": {
+            "signal": "4 * datum.r * datum.r"
+          },
+          "fill": {
+            "value": "#FFFDF8"
+          },
+          "stroke": {
+            "value": "#6B6355"
+          },
+          "strokeWidth": {
+            "value": 1
+          }
+        }
+      }
+    },
+    {
+      "type": "text",
+      "from": {
+        "data": "size_legend"
+      },
+      "aria": false,
+      "interactive": false,
+      "encode": {
+        "enter": {
+          "x": {
+            "field": "cx"
+          },
+          "y": {
+            "value": 599
+          },
+          "text": {
+            "field": "label"
+          },
+          "align": {
+            "value": "center"
+          },
+          "font": {
+            "value": "'DM Sans', system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
+          },
+          "fontSize": {
+            "value": 11
+          },
+          "fill": {
+            "value": "#3B4757"
+          }
+        }
+      }
+    },
+    {
+      "type": "text",
+      "from": {
+        "data": "summary"
+      },
+      "aria": false,
+      "interactive": false,
+      "encode": {
+        "enter": {
+          "x": {
+            "value": 0
+          },
+          "y": {
+            "value": 14
+          },
+          "font": {
+            "value": "'DM Sans', system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
+          },
+          "fontSize": {
+            "value": 14
+          },
+          "fontWeight": {
+            "value": 800
+          },
+          "fill": {
+            "value": "#1B2A41"
+          }
+        },
+        "update": {
+          "text": {
+            "field": "line1"
+          }
+        }
+      }
+    },
+    {
+      "type": "text",
+      "from": {
+        "data": "summary"
+      },
+      "aria": false,
+      "interactive": false,
+      "encode": {
+        "enter": {
+          "x": {
+            "value": 0
+          },
+          "y": {
+            "value": 33
+          },
+          "font": {
+            "value": "'DM Sans', system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
+          },
+          "fontSize": {
+            "value": 12.5
+          },
+          "fill": {
+            "value": "#3B4757"
+          }
+        },
+        "update": {
+          "text": {
+            "field": "line2"
+          }
+        }
+      }
+    }
+  ],
+  "signals": [
+    {
+      "name": "steps",
+      "value": [
+        0,
+        1000,
+        5000,
+        10000,
+        25000,
+        50000,
+        100000,
+        250000,
+        500000,
+        1500000
+      ]
+    },
+    {
+      "name": "lo_i",
+      "value": 0,
+      "bind": {
+        "input": "range",
+        "min": 0,
+        "max": 9,
+        "step": 1,
+        "name": "Smallest council shown "
+      }
+    },
+    {
+      "name": "hi_i",
+      "value": 9,
+      "bind": {
+        "input": "range",
+        "min": 0,
+        "max": 9,
+        "step": 1,
+        "name": "Largest council shown "
+      }
+    },
+    {
+      "name": "lo_pop",
+      "update": "steps[lo_i]"
+    },
+    {
+      "name": "hi_pop",
+      "update": "steps[hi_i]"
+    }
+  ]
+}
