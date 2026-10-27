@@ -342,8 +342,8 @@ def sankey(nat: Path):
     for n in nodes.values():
         n["share"] = r4(n["value"] / adults)
         n["label"] = n["name"]
-        n["sublabel"] = (f"{n['value'] / 1e6:.1f}M adults" if n["side"] == "left"
-                         else f"{n['value'] / 1e6:.1f}M · {round(100 * n['value'] / adults)}% of adults")
+        n["sublabel"] = (f"{n['value'] / 1e6:.1f} million adults" if n["side"] == "left"
+                         else f"{n['value'] / 1e6:.1f} million · {round(100 * n['value'] / adults)}% of adults")
         for key in ("y0", "y1"):
             n[key] = round(n[key], 2)
         n["value"] = round(n["value"])

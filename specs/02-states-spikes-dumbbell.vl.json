@@ -176,8 +176,12 @@
           },
           "transform": [
             {
-              "calculate": "datum.state + '  ' + format(datum.public_people / 1e6, '.1f') + 'M'",
+              "calculate": "datum.state + '  ' + format(datum.public_people / 1e6, '.1f') + ' million'",
               "as": "label"
+            },
+            {
+              "calculate": "datum.state == 'VIC' ? datum.lon - 4.5 : datum.lon",
+              "as": "label_lon"
             }
           ],
           "mark": {
@@ -189,7 +193,7 @@
           },
           "encoding": {
             "longitude": {
-              "field": "lon",
+              "field": "label_lon",
               "type": "quantitative"
             },
             "latitude": {
@@ -220,7 +224,7 @@
           "as": "gap"
         },
         {
-          "calculate": "'+' + round(datum.gap * 100) + ' pts'",
+          "calculate": "'+' + round(datum.gap * 100) + ' points'",
           "as": "gap_label"
         }
       ],
